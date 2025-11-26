@@ -38,6 +38,7 @@ Aplikasi ini hadir untuk menjawab kebutuhan pengguna yang selama ini harus menca
 | **Comparison**               | Perbandingan statistik pemain   | Bandingkan performa beberapa pemain secara visual dan interaktif            |
 | **View/Edit Profile**        | Manajemen profil pengguna       | Edit akun, preferensi klub & liga, serta pengaturan tampilan                |
 | **Football Transfer Rumour** | Modul berita transfer pemain    | Analyst dapat membuat, mengedit dan men-delete berita yang dibuatnya        |
+| **Login, Authentification, and Database** | Dashboard dan player management    | Landing page dan untuk menambahkan pemain dan klub        |
 
 ---
 
@@ -46,7 +47,7 @@ Aplikasi ini hadir untuk menjawab kebutuhan pengguna yang selama ini harus menca
 - Modul Favorite Player List (Zaky)
 Pengguna dapat menambah, melihat, mengedit, dan menghapus daftar pemain favorit secara mobile untuk memantau performa pemain idola mereka.
 
-- Modul Match Prediction (Haekal Muzaki)
+- Modul Match Prediction (Haikal Muzaki)
 Pengguna dapat membuat, membaca, memperbarui, dan menghapus prediksi pertandingan secara mandiri.
 
 - Modul Football Discussion (Muhammad Haikal)
@@ -60,6 +61,9 @@ Pengguna dapat mengelola profil pribadi, termasuk preferensi liga, klub favorit,
 
 - Modul Transfer Rumour (Malik Kareem)
 Modul dimana pengguna dapat membaca berita terbaru mengenai rumor rumor transfer. Pengguna dengan role analyst dapat membuat dan mendelete berita yang dibuat oleh mereka sendiri.
+
+- Modul Login, Authentification, and Database (Jefferson Tirza)
+Modul dimana pengguna dapat melakukan autentikasi berupa register dan login. Selain itu akan ada 3 role berupa basic-user sebagai user biasa, admin yang dapat mengedit, menambahkan, menghapus database dan analyst yang dapat menambahkan prediksi sebuah pertandingan
 
 
 ---
