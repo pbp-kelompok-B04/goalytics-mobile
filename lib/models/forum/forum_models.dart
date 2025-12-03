@@ -75,3 +75,61 @@ class ForumPost {
   }
 }
 
+@immutable
+class ForumComment {
+  const ForumComment({
+    required this.id,
+    required this.user,
+    required this.content,
+    required this.createdAt,
+    this.parentId,
+    this.replies = const [],
+    this.isOwner = false,
+    this.likeCount = 0,
+    this.isLiked = false,
+    this.avatar,
+  });
+
+  factory ForumComment.fromJson(Map<String, dynamic> json) {
+    return ForumComment(
+      id: json['id'] as int,
+      user: json['user'] ?? '',
+      content: json['content'] ?? '',
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      parentId: json['parent_id'],
+      replies: (json['replies'] as List<dynamic>? ?? [])
+          .map((e) => ForumComment.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      isOwner: json['is_owner'] ?? false,
+      likeCount: json['like_count'] ?? 0,
+      isLiked: json['is_liked'] ?? false,
+      avatar: json['avatar'],
+    );
+  }
+
+  final int id;
+  final String user;
+  final String content;
+  final DateTime createdAt;
+  final int? parentId;
+  final List<ForumComment> replies;
+  final bool isOwner;
+  final int likeCount;
+  final bool isLiked;
+  final String? avatar;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'user': user,
+      'content': content,
+      'created_at': createdAt.toIso8601String(),
+      'parent_id': parentId,
+      'is_owner': isOwner,
+      'like_count': likeCount,
+      'is_liked': isLiked,
+      if (avatar != null) 'avatar': avatar,
+      'replies': replies.map((c) => c.toJson()).toList(),
+    };
+  }
+}
