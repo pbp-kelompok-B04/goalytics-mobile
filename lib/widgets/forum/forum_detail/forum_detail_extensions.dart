@@ -1,16 +1,21 @@
-import 'package:flutter/material.dart';
+import 'package:goalytics_mobile/models/forum/forum_models.dart';
 
-class ForumDetailMeta extends StatelessWidget {
-  const ForumDetailMeta({super.key, required this.icon, required this.label});
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      Icon(icon, size: 14, color: Colors.grey),
-      const SizedBox(width: 4),
-      Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey))
-    ]);
+extension ForumCommentCopy on ForumComment {
+  ForumComment copyWith({
+    bool? isLiked,
+    int? likeCount,
+  }) {
+    return ForumComment(
+      id: id,
+      user: user,
+      content: content,
+      createdAt: createdAt,
+      parentId: parentId,
+      replies: replies,
+      isOwner: isOwner,
+      isLiked: isLiked ?? this.isLiked,
+      likeCount: likeCount ?? this.likeCount,
+      avatar: avatar,
+    );
   }
 }
