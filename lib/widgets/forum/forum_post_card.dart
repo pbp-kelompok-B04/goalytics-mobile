@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/models/forum_models.dart';
+import 'package:goalytics_mobile/models/forum/forum_models.dart';
 import 'forum_meta.dart';
 
 class ForumPostCard extends StatelessWidget {
