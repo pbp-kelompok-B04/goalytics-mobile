@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/config.dart';
-import 'package:goalytics_mobile/models/forum_models.dart';
-import 'package:goalytics_mobile/screens/post_detail_screen.dart';
+import 'package:goalytics_mobile/models/forum/forum_models.dart';
+import 'package:goalytics_mobile/screens/forum/post_detail_screen.dart';
 import 'package:goalytics_mobile/services/forum_service.dart';
 import 'package:goalytics_mobile/widgets/sidebar_scaffold.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -41,7 +41,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final service = ForumService(context.read(), baseUrl: kApiBaseUrl);
+    final service = ForumService(context.read(), baseUrl: 'http://127.0.0.1:8000');
 
     try {
       final posts = await service.fetchPosts(
@@ -65,7 +65,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
         context: context,
         notifications: _notifications,
         onMarkRead: () async {
-          final service = ForumService(context.read(), baseUrl: kApiBaseUrl);
+          final service = ForumService(context.read(), baseUrl: 'http://127.0.0.1:8000');
           await service.markNotificationsRead();
           setState(() {
             _notifUnread = false;
@@ -78,7 +78,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
         context: context,
         initialLeague: _league,
         onSubmit: (title, content, league, mediaUrl) async {
-          final service = ForumService(context.read(), baseUrl: kApiBaseUrl);
+          final service = ForumService(context.read(), baseUrl: 'http://127.0.0.1:8000');
           await service.createPost(
             title: title,
             content: content,
@@ -128,10 +128,10 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
               posts: _filtered,
               onTapPost: (p) => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => PostDetailScreen(postId: p.id)),
+                MaterialPageRoute(builder: (_) => PostDetailScreen(postId: p.id))
               ),
               onLike: (p) async {
-                final service = ForumService(context.read(), baseUrl: kApiBaseUrl);
+                final service = ForumService(context.read(), baseUrl: 'http://127.0.0.1:8000');
                 final count = await service.togglePostLike(p.id);
                 setState(() {
                   _posts = _posts.map((e) => e.id == p.id
