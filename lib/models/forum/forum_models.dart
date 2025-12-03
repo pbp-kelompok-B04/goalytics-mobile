@@ -133,3 +133,62 @@ class ForumComment {
     };
   }
 }
+
+@immutable
+class ForumNotification {
+  const ForumNotification({
+    required this.id,
+    required this.actor,
+    required this.verb,
+    required this.createdAt,
+    this.postId,
+    this.commentId,
+    this.isRead = false,
+  });
+
+  factory ForumNotification.fromJson(Map<String, dynamic> json) {
+    return ForumNotification(
+      id: json['id'] as int,
+      actor: json['actor'] ?? '',
+      verb: json['verb'] ?? '',
+      postId: json['post_id'],
+      commentId: json['comment_id'],
+      isRead: json['is_read'] ?? false,
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+    );
+  }
+
+  final int id;
+  final String actor;
+  final String verb;
+  final int? postId;
+  final int? commentId;
+  final bool isRead;
+  final DateTime createdAt;
+
+  ForumNotification copyWith({
+    bool? isRead,
+  }) {
+    return ForumNotification(
+      id: id,
+      actor: actor,
+      verb: verb,
+      postId: postId,
+      commentId: commentId,
+      isRead: isRead ?? this.isRead,
+      createdAt: createdAt,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'actor': actor,
+      'verb': verb,
+      'post_id': postId,
+      'comment_id': commentId,
+      'is_read': isRead,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
+}
