@@ -1,0 +1,77 @@
+import 'package:meta/meta.dart';
+
+@immutable
+class ForumPost {
+  const ForumPost({
+    required this.id,
+    required this.author,
+    required this.title,
+    required this.content,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.league,
+    this.avatar,
+    this.commentCount = 0,
+    this.likeCount = 0,
+    this.isLiked = false,
+    this.isAuthor = false,
+    this.mediaUrl,
+    this.attachmentUrl,
+  });
+
+  factory ForumPost.fromJson(Map<String, dynamic> json) {
+    return ForumPost(
+      id: json['id'] as int,
+      author: json['author'] ?? '',
+      title: json['title'] ?? '',
+      content: json['content'] ?? '',
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ??
+          DateTime.tryParse(json['createdAt'] ?? '') ??
+          DateTime.now(),
+      league: json['league'] ?? 'EPL',
+      avatar: json['avatar'],
+      commentCount: json['comment_count'] ?? 0,
+      likeCount: json['like_count'] ?? 0,
+      isLiked: json['is_liked'] ?? false,
+      isAuthor: json['is_author'] ?? false,
+      mediaUrl: json['media_url'],
+      attachmentUrl: json['attachment_url'],
+    );
+  }
+
+  final int id;
+  final String author;
+  final String title;
+  final String content;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String league;
+  final String? avatar;
+  final int commentCount;
+  final int likeCount;
+  final bool isLiked;
+  final bool isAuthor;
+  final String? mediaUrl;
+  final String? attachmentUrl;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'author': author,
+      'title': title,
+      'content': content,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'league': league,
+      'comment_count': commentCount,
+      'like_count': likeCount,
+      'is_liked': isLiked,
+      'is_author': isAuthor,
+      if (avatar != null) 'avatar': avatar,
+      if (mediaUrl != null) 'media_url': mediaUrl,
+      if (attachmentUrl != null) 'attachment_url': attachmentUrl,
+    };
+  }
+}
+
