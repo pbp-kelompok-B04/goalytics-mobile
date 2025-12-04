@@ -167,10 +167,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       );
     }
 
-    return SidebarScaffold(
-      currentRoute: '/forum',
-      username: widget.username,
-      child: content,
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      drawer: const LeftDrawer(),
+      body: SafeArea(child: content),
     );
   }
 }

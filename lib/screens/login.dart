@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goalytics_mobile/config.dart';
 import 'package:goalytics_mobile/menu.dart';
 import 'package:goalytics_mobile/screens/register.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -183,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: ElevatedButton(
                           onPressed: () async {
                             final response = await request.login(
-                              "http://localhost:8000/auth/login/",
+                              "$kApiBaseUrl/auth/login/",
                               {
                                 'username': _usernameController.text,
                                 'password': _passwordController.text,

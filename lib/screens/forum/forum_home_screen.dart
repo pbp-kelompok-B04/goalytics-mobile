@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/config.dart';
-import 'package:goalytics_mobile/models/forum_models.dart';
-import 'package:goalytics_mobile/screens/post_detail_screen.dart';
+import 'package:goalytics_mobile/models/forum/forum_models.dart';
+import 'package:goalytics_mobile/screens/forum/post_detail_screen.dart';
 import 'package:goalytics_mobile/services/forum_service.dart';
 import 'package:goalytics_mobile/widgets/forum/forum_card.dart';
 import 'package:goalytics_mobile/widgets/forum/forum_chip_button.dart';
@@ -9,7 +9,7 @@ import 'package:goalytics_mobile/widgets/forum/forum_filter_chip.dart';
 import 'package:goalytics_mobile/widgets/forum/forum_form_fields.dart';
 import 'package:goalytics_mobile/widgets/forum/forum_post_card.dart';
 import 'package:goalytics_mobile/widgets/forum/forum_time.dart';
-import 'package:goalytics_mobile/widgets/sidebar_scaffold.dart';
+import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -47,18 +47,42 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
     setState(() => _loading = true);
     final req = context.read<CookieRequest>();
     final service = ForumService(req, baseUrl: kApiBaseUrl);
+
+    // Debug: cek status login
+    debugPrint('[ForumHomeScreen] loggedIn: ${req.loggedIn}');
+    debugPrint('[ForumHomeScreen] cookies: ${req.cookies}');
+
     try {
+      debugPrint('[ForumHomeScreen] fetching posts...');
       final posts = await service.fetchPosts(
         league: _league.isEmpty ? null : _league,
         sort: _sort,
         mine: _mine,
       );
-      final notifs = await service.getNotifications();
+      debugPrint('[ForumHomeScreen] posts fetched: ${posts.length}');
+
+      debugPrint('[ForumHomeScreen] fetching notifications...');
+      List<ForumNotification> notifs = [];
+      // Hanya fetch notifikasi kalau sudah login
+      if (req.loggedIn) {
+        try {
+          notifs = await service.getNotifications();
+          debugPrint('[ForumHomeScreen] notifications fetched: ${notifs.length}');
+        } catch (e) {
+          debugPrint('[ForumHomeScreen] notifications failed (skipping): $e');
+        }
+      } else {
+        debugPrint('[ForumHomeScreen] skipping notifications (not logged in)');
+      }
+
       setState(() => _posts = posts);
       setState(() {
         _notifications = notifs;
         _notifUnread = notifs.any((n) => !n.isRead);
       });
+    } catch (e, st) {
+      debugPrint('[ForumHomeScreen] ERROR in _load: $e');
+      debugPrint('[ForumHomeScreen] StackTrace: $st');
     } finally {
       setState(() => _loading = false);
     }
@@ -70,8 +94,9 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
     await service.markNotificationsRead();
     setState(() {
       _notifUnread = false;
-      _notifications =
-          _notifications.map((n) => n.copyWith(isRead: true)).toList();
+      _notifications = _notifications
+          .map((n) => n.copyWith(isRead: true))
+          .toList();
     });
   }
 
@@ -92,19 +117,28 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
                           (n) => ListTile(
                             dense: true,
                             leading: Icon(
-                              n.isRead ? Icons.notifications_none : Icons.notifications,
-                              color: n.isRead ? const Color(0xFF94A3B8) : const Color(0xFF0F172A),
+                              n.isRead
+                                  ? Icons.notifications_none
+                                  : Icons.notifications,
+                              color: n.isRead
+                                  ? const Color(0xFF94A3B8)
+                                  : const Color(0xFF0F172A),
                             ),
                             title: Text(
                               '${n.actor} ${n.verb}',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: n.isRead ? const Color(0xFF475569) : const Color(0xFF0F172A),
+                                color: n.isRead
+                                    ? const Color(0xFF475569)
+                                    : const Color(0xFF0F172A),
                               ),
                             ),
                             subtitle: Text(
                               formatForumTime(n.createdAt),
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF94A3B8),
+                              ),
                             ),
                           ),
                         )
@@ -259,10 +293,12 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
     if (_query.isEmpty) return _posts;
     final q = _query.toLowerCase();
     return _posts
-        .where((p) =>
-            p.title.toLowerCase().contains(q) ||
-            p.content.toLowerCase().contains(q) ||
-            p.author.toLowerCase().contains(q))
+        .where(
+          (p) =>
+              p.title.toLowerCase().contains(q) ||
+              p.content.toLowerCase().contains(q) ||
+              p.author.toLowerCase().contains(q),
+        )
         .toList();
   }
 
@@ -346,10 +382,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
             const SizedBox(height: 12),
             const Text(
               'Join the conversation about your favorite teams and players.',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF94A3B8),
-              ),
+              style: TextStyle(fontSize: 14, color: Color(0xFF94A3B8)),
             ),
             const SizedBox(height: 16),
             ForumCard(
@@ -483,8 +516,10 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
                         },
                         onLike: () async {
                           final req = context.read<CookieRequest>();
-                          final service =
-                              ForumService(req, baseUrl: kApiBaseUrl);
+                          final service = ForumService(
+                            req,
+                            baseUrl: kApiBaseUrl,
+                          );
                           final likeCount = await service.togglePostLike(p.id);
                           setState(() {
                             _posts = _posts
@@ -515,19 +550,16 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
       );
     }
 
-    return SidebarScaffold(
-      currentRoute: '/forum',
-      username: widget.username,
-      child: SafeArea(child: content),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      drawer: const LeftDrawer(),
+      body: SafeArea(child: content),
     );
   }
 }
 
 extension on ForumPost {
-  ForumPost copyWith({
-    bool? isLiked,
-    int? likeCount,
-  }) {
+  ForumPost copyWith({bool? isLiked, int? likeCount}) {
     return ForumPost(
       id: id,
       author: author,
