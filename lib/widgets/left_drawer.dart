@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/menu.dart';
+import 'package:goalytics_mobile/screens/forum/forum_home_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -11,12 +12,9 @@ class LeftDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-
           // ===================== HEADER =====================
           DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Color(0xff1c2341),
-            ),
+            decoration: const BoxDecoration(color: Color(0xff1c2341)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
@@ -37,10 +35,7 @@ class LeftDrawer extends StatelessWidget {
                 SizedBox(height: 4),
                 Text(
                   "Your football companion",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white70),
                 ),
               ],
             ),
@@ -54,8 +49,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const MyHomePage(title: "Dashboard"),
+                  builder: (context) => const MyHomePage(title: "Dashboard"),
                 ),
               );
             },
@@ -81,7 +75,13 @@ class LeftDrawer extends StatelessWidget {
             icon: Icons.forum,
             title: "Discussion Forum",
             onTap: () {
-              // TODO: Routing nanti
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const ForumHomeScreen(withSidebar: true),
+                ),
+              );
             },
           ),
 
@@ -97,11 +97,7 @@ class LeftDrawer extends StatelessWidget {
             onTap: () {},
           ),
 
-          _drawerItem(
-            icon: Icons.search,
-            title: "Find Users",
-            onTap: () {},
-          ),
+          _drawerItem(icon: Icons.search, title: "Find Users", onTap: () {}),
 
           const Divider(color: Colors.white24),
 
@@ -111,11 +107,7 @@ class LeftDrawer extends StatelessWidget {
             onTap: () {},
           ),
 
-          _drawerItem(
-            icon: Icons.logout,
-            title: "Logout",
-            onTap: () {},
-          ),
+          _drawerItem(icon: Icons.logout, title: "Logout", onTap: () {}),
         ],
       ),
     );

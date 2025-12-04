@@ -4,7 +4,7 @@ class ForumFilterChip extends StatelessWidget {
   const ForumFilterChip({
     super.key,
     required this.label,
-    this.active = false,
+    required this.active,
     required this.onTap,
   });
 
@@ -17,7 +17,7 @@ class ForumFilterChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+        duration: const Duration(milliseconds: 120),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: active ? const Color(0xFF0F172A) : Colors.white,
@@ -31,16 +31,16 @@ class ForumFilterChip extends StatelessWidget {
                     color: Color(0x33000000),
                     blurRadius: 10,
                     offset: Offset(0, 6),
-                  )
+                  ),
                 ]
-              : [],
+              : const [],
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: active ? Colors.white : const Color(0xFF475569),
-            fontWeight: FontWeight.w600,
             fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: active ? Colors.white : const Color(0xFF475569),
           ),
         ),
       ),

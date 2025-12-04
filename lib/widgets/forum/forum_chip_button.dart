@@ -5,7 +5,7 @@ class ForumChipButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.icon,
-    this.active = false,
+    required this.active,
     required this.onTap,
   });
 
@@ -29,14 +29,18 @@ class ForumChipButton extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: active ? Colors.white : const Color(0xFF475569)),
+            Icon(
+              icon,
+              size: 16,
+              color: active ? Colors.white : const Color(0xFF475569),
+            ),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: active ? Colors.white : const Color(0xFF475569),
-                fontWeight: FontWeight.w600,
                 fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: active ? Colors.white : const Color(0xFF475569),
               ),
             ),
           ],
