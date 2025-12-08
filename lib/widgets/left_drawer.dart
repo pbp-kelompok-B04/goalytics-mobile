@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/menu.dart';
+import 'package:goalytics_mobile/screens/rumour_list.dart'; 
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -94,7 +95,14 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.swap_horiz,
             title: "Transfer Rumours",
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RumourListPage(), 
+                ),
+              );
+            },
           ),
 
           _drawerItem(
