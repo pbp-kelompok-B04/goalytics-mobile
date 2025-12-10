@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/menu.dart';
+import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -88,7 +89,14 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.compare_arrows,
             title: "Player Comparison",
-            onTap: () {},
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ComparisonScreen(),
+                ),
+              );
+            },
           ),
 
           _drawerItem(
