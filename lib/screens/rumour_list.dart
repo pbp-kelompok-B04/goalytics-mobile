@@ -1,4 +1,3 @@
-// lib/screens/rumour_list.dart
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +16,7 @@ class RumourListPage extends StatefulWidget {
 class _RumourListPageState extends State<RumourListPage> {
   Future<List<RumourEntry>> fetchRumours(CookieRequest request) async {
     final response =
-        await request.get('http://127.0.0.1:8000//transfer-rumours/json/');
+        await request.get('http://localhost:8000//transfer-rumours/json/');
 
     List<RumourEntry> rumourList = [];
     for (var item in response) {

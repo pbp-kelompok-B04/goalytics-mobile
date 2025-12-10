@@ -87,7 +87,7 @@ class RumourDetailPage extends StatelessWidget {
               if (confirm != true) return;
 
               final url =
-                  'http://127.0.0.1:8000/transfer-rumours/${rumour.slug}/delete-flutter/';
+                  'http://localhost:8000/transfer-rumours/${rumour.slug}/delete-flutter/';
 
               final response = await request.postJson(
                 url,

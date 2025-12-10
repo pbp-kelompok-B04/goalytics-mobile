@@ -1,4 +1,3 @@
-// lib/screens/rumour_form.dart
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -66,7 +65,7 @@ class _RumourFormPageState extends State<RumourFormPage> {
       'cover_image_url': _coverImageUrlController.text.trim(),
     };
 
-    final baseUrl = 'http://127.0.0.1:8000/transfer-rumours';
+    final baseUrl = 'http://localhost:8000/transfer-rumours';
 
     final url = isEdit
         ? '$baseUrl/${widget.existingRumour!.slug}/update-flutter/'
@@ -89,14 +88,8 @@ class _RumourFormPageState extends State<RumourFormPage> {
           ),
         ),
       );
-      // kembali ke list
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const RumourListPage(),
-        ),
-        (route) => false,
-      );
+
+      Navigator.pop(context, true);
     } else {
       final msg = response['message'] ?? 'Terjadi kesalahan.';
       ScaffoldMessenger.of(context).showSnackBar(
