@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/menu.dart';
+import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour_list.dart';
 import 'package:goalytics_mobile/screens/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/explore_profile_page.dart';
@@ -116,7 +117,14 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.compare_arrows,
             title: "Player Comparison",
-            onTap: () {},
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ComparisonScreen(),
+                ),
+              );
+            },
           ),
 
           _drawerItem(
