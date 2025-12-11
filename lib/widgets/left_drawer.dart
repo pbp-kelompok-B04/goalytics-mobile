@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/menu.dart';
+import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
+import 'package:goalytics_mobile/screens/rumour_list.dart';
+import 'package:goalytics_mobile/screens/my_profile_page.dart';
+import 'package:goalytics_mobile/screens/explore_profile_page.dart';
 import 'package:goalytics_mobile/screens/forum/forum_home_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
@@ -49,7 +53,34 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const MyHomePage(title: "Dashboard"),
+                  builder: (context) =>
+                      const MyHomePage(title: "Dashboard"),
+                ),
+              );
+            },
+          ),
+
+          _drawerItem(
+            icon: Icons.person_outline,
+            title: "My Profile",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MyProfilePage(),
+                ),
+              );
+            },
+          ),
+
+          _drawerItem(
+            icon: Icons.swap_horiz,
+            title: "Transfer Rumours",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RumourListPage(),
                 ),
               );
             },
@@ -88,32 +119,51 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.compare_arrows,
             title: "Player Comparison",
-            onTap: () {},
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ComparisonScreen(),
+                ),
+              );
+            },
           ),
 
           _drawerItem(
-            icon: Icons.swap_horiz,
-            title: "Transfer Rumours",
-            onTap: () {},
+            icon: Icons.search,
+            title: "Find Users",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ExploreProfilesPage(),
+                ),
+              );
+            },
           ),
-
-          _drawerItem(icon: Icons.search, title: "Find Users", onTap: () {}),
 
           const Divider(color: Colors.white24),
 
           _drawerItem(
             icon: Icons.settings_outlined,
             title: "Settings",
-            onTap: () {},
+            onTap: () {
+              // TODO: Routing nanti
+            },
           ),
 
-          _drawerItem(icon: Icons.logout, title: "Logout", onTap: () {}),
+          _drawerItem(
+            icon: Icons.logout,
+            title: "Logout",
+            onTap: () {
+              // TODO: Nanti diisi logic logout (hapus session, balik ke LoginPage)
+            },
+          ),
         ],
       ),
     );
   }
 
-  // ===================== ITEM WIDGET =====================
   Widget _drawerItem({
     required IconData icon,
     required String title,
