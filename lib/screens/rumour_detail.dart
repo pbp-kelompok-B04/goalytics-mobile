@@ -1,4 +1,3 @@
-// lib/screens/rumour_detail.dart
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,6 +7,8 @@ import 'package:provider/provider.dart';
 import '../models/rumour_entry.dart';
 import 'rumour_form.dart';
 import 'rumour_list.dart';
+import '../widgets/left_drawer.dart';
+
 
 class RumourDetailPage extends StatelessWidget {
   final RumourEntry rumour;
@@ -38,6 +39,7 @@ class RumourDetailPage extends StatelessWidget {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
+      drawer: const LeftDrawer(),
       appBar: AppBar(
         title: const Text('Detail Rumour'),
         actions: [
@@ -91,7 +93,7 @@ class RumourDetailPage extends StatelessWidget {
 
               final response = await request.postJson(
                 url,
-                jsonEncode({}), // body boleh kosong
+                jsonEncode({}), 
               );
 
               if (context.mounted) {

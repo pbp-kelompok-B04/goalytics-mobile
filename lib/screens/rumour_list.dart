@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../models/rumour_entry.dart';
 import 'rumour_detail.dart';
 import 'rumour_form.dart';
+import '../widgets/left_drawer.dart';
+
 
 class RumourListPage extends StatefulWidget {
   const RumourListPage({super.key});
@@ -343,7 +345,16 @@ class _RumourListPageState extends State<RumourListPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
+      drawer: const LeftDrawer(),
       backgroundColor: const Color(0xFFF5F6FA),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF5F6FA),
+        elevation: 0,
+        iconTheme: const IconThemeData(
+          color: Colors.black,   
+      ),
+      automaticallyImplyLeading: true,
+    ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),

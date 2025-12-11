@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/menu.dart';
-import 'package:goalytics_mobile/screens/rumour_list.dart'; 
+import 'package:goalytics_mobile/screens/rumour_list.dart';
+import 'package:goalytics_mobile/screens/my_profile_page.dart';
+import 'package:goalytics_mobile/screens/explore_profile_page.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -12,7 +14,6 @@ class LeftDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-
           // ===================== HEADER =====================
           DrawerHeader(
             decoration: const BoxDecoration(
@@ -63,6 +64,32 @@ class LeftDrawer extends StatelessWidget {
           ),
 
           _drawerItem(
+            icon: Icons.person_outline,
+            title: "My Profile",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MyProfilePage(),
+                ),
+              );
+            },
+          ),
+
+          _drawerItem(
+            icon: Icons.swap_horiz,
+            title: "Transfer Rumours",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RumourListPage(),
+                ),
+              );
+            },
+          ),
+
+          _drawerItem(
             icon: Icons.favorite,
             title: "Favorite Players",
             onTap: () {
@@ -93,22 +120,16 @@ class LeftDrawer extends StatelessWidget {
           ),
 
           _drawerItem(
-            icon: Icons.swap_horiz,
-            title: "Transfer Rumours",
+            icon: Icons.search,
+            title: "Find Users",
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const RumourListPage(), 
+                  builder: (_) => const ExploreProfilesPage(),
                 ),
               );
             },
-          ),
-
-          _drawerItem(
-            icon: Icons.search,
-            title: "Find Users",
-            onTap: () {},
           ),
 
           const Divider(color: Colors.white24),
@@ -116,20 +137,23 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.settings_outlined,
             title: "Settings",
-            onTap: () {},
+            onTap: () {
+              // TODO: Routing nanti
+            },
           ),
 
           _drawerItem(
             icon: Icons.logout,
             title: "Logout",
-            onTap: () {},
+            onTap: () {
+              // TODO: Nanti diisi logic logout (hapus session, balik ke LoginPage)
+            },
           ),
         ],
       ),
     );
   }
 
-  // ===================== ITEM WIDGET =====================
   Widget _drawerItem({
     required IconData icon,
     required String title,

@@ -5,7 +5,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../models/rumour_entry.dart';
-import 'rumour_list.dart';
+import '../widgets/left_drawer.dart';
 
 class RumourFormPage extends StatefulWidget {
   final RumourEntry? existingRumour;
@@ -30,16 +30,21 @@ class _RumourFormPageState extends State<RumourFormPage> {
   @override
   void initState() {
     super.initState();
-    _titleController =
-        TextEditingController(text: widget.existingRumour?.title ?? '');
-    _summaryController =
-        TextEditingController(text: widget.existingRumour?.summary ?? '');
-    _contentController =
-        TextEditingController(text: widget.existingRumour?.content ?? '');
-    _sourceUrlController =
-        TextEditingController(text: widget.existingRumour?.sourceUrl ?? '');
-    _coverImageUrlController =
-        TextEditingController(text: widget.existingRumour?.coverImageUrl ?? '');
+    _titleController = TextEditingController(
+      text: widget.existingRumour?.title ?? '',
+    );
+    _summaryController = TextEditingController(
+      text: widget.existingRumour?.summary ?? '',
+    );
+    _contentController = TextEditingController(
+      text: widget.existingRumour?.content ?? '',
+    );
+    _sourceUrlController = TextEditingController(
+      text: widget.existingRumour?.sourceUrl ?? '',
+    );
+    _coverImageUrlController = TextEditingController(
+      text: widget.existingRumour?.coverImageUrl ?? '',
+    );
   }
 
   @override
@@ -71,10 +76,7 @@ class _RumourFormPageState extends State<RumourFormPage> {
         ? '$baseUrl/${widget.existingRumour!.slug}/update-flutter/'
         : '$baseUrl/create-flutter/';
 
-    final response = await request.postJson(
-      url,
-      jsonEncode(payload),
-    );
+    final response = await request.postJson(url, jsonEncode(payload));
 
     if (!mounted) return;
 
@@ -82,9 +84,7 @@ class _RumourFormPageState extends State<RumourFormPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isEdit
-                ? 'Rumour berhasil diperbarui.'
-                : 'Rumour berhasil dibuat.',
+            isEdit ? 'Rumour berhasil diperbarui.' : 'Rumour berhasil dibuat.',
           ),
         ),
       );
@@ -92,9 +92,9 @@ class _RumourFormPageState extends State<RumourFormPage> {
       Navigator.pop(context, true);
     } else {
       final msg = response['message'] ?? 'Terjadi kesalahan.';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal menyimpan rumour: $msg')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal menyimpan rumour: $msg')));
     }
   }
 
@@ -103,15 +103,15 @@ class _RumourFormPageState extends State<RumourFormPage> {
     final titleText = isEdit ? 'Edit Rumour' : 'Tambah Rumour';
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(titleText),
-      ),
+      drawer: const LeftDrawer(),
+      appBar: AppBar(title: Text(titleText)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Card(
           elevation: 4,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
@@ -184,7 +184,9 @@ class _RumourFormPageState extends State<RumourFormPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () => _submit(context),
-                      child: Text(isEdit ? 'Simpan Perubahan' : 'Tambah Rumour'),
+                      child: Text(
+                        isEdit ? 'Simpan Perubahan' : 'Tambah Rumour',
+                      ),
                     ),
                   ),
                 ],
