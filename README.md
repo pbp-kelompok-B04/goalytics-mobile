@@ -44,8 +44,8 @@ Aplikasi ini hadir untuk menjawab kebutuhan pengguna yang selama ini harus menca
 
 ## 📌 Deskripsi Singkat Modul
 
-- Modul Favorite Player List (Zaky)
-Pengguna dapat menambah, melihat, mengedit, dan menghapus daftar pemain favorit secara mobile untuk memantau performa pemain idola mereka.
+- Modul Dream Squad (Zaky)
+Pengguna dapat menambah, melihat, mengedit, dan menghapus daftar squad impian secara mobile untuk memantau squad terbaik mereka.
 
 - Modul Match Prediction (Haikal Muzaki)
 Pengguna dapat membuat, membaca, memperbarui, dan menghapus prediksi pertandingan secara mandiri.
