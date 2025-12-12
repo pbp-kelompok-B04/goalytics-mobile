@@ -20,13 +20,31 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
+  String? username;
+  bool isLoadingUser = true;
+
+  Future<void> fetchUsername() async {
+  final request = context.read<CookieRequest>();
+
+  final response = await request.get("http://your-url/auth/user-info/");
+
+  setState(() {
+    username = response['username'];
+    isLoadingUser = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUsername();
+  }
 
   void _navigateBottomBar(int index) {
     setState(() => _selectedIndex = index);
 
     switch (index) {
       case 0:
-        // Home → stay here
         break;
       case 1:
         Navigator.push(context,
