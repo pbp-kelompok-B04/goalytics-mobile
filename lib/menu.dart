@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:goalytics_mobile/widgets/left_drawer.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
-import 'package:goalytics_mobile/screens/rumour_list.dart';
-import 'package:goalytics_mobile/screens/explore_profile_page.dart';
+import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
+import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
+import 'package:goalytics_mobile/screens/favorite_player/favorite_players.dart';
+import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
+import 'package:goalytics_mobile/screens/discussion/discussion_forum.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -13,6 +19,38 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0;
+
+  void _navigateBottomBar(int index) {
+    setState(() => _selectedIndex = index);
+
+    switch (index) {
+      case 0:
+        // Home → stay here
+        break;
+      case 1:
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const FavoritePlayersPage()));
+        break;
+      case 2:
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const MatchPredictionPage()));
+        break;
+      case 3:
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const DiscussionForumPage()));
+        break;
+      case 4:
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const ComparisonScreen()));
+        break;
+      case 5:
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const RumourListPage()));
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,6 +60,8 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
+
+      // MAIN CONTENT
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -54,13 +94,11 @@ class _MyHomePageState extends State<MyHomePage> {
               description: "Predict upcoming matches and test your intuition.",
               icon: Icons.psychology,
             ),
-
             _featureCard(
               title: "Discussion Forum",
               description: "Discuss matches, players, and more!",
               icon: Icons.forum,
             ),
-
             _featureCard(
               title: "Player Comparison",
               description: "Compare two players head-to-head!",
@@ -79,12 +117,15 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+
+      // BOTTOM NAVBAR
+      bottomNavigationBar: BottomNav(
+        currentIndex: _selectedIndex,
+        onTap: _navigateBottomBar,
+      ),
     );
   }
 
-  // ==================================================
-  //                FEATURE CARD WIDGET
-  // ==================================================
   Widget _featureCard({
     required String title,
     required String description,
@@ -94,32 +135,22 @@ class _MyHomePageState extends State<MyHomePage> {
       onTap: () {
         if (title == "Player Comparison") {
           Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const ComparisonScreen(),
-        // Route spesifik per feature
-        if (title == "Transfer Rumours") {
+              context, MaterialPageRoute(builder: (_) => const ComparisonScreen()));
+        } else if (title == "Transfer Rumours") {
           Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const RumourListPage(),
-            ),
-          );
+              context, MaterialPageRoute(builder: (_) => const RumourListPage()));
         } else if (title == "Find Users") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const ExploreProfilesPage(),
-            ),
-          );
-        } else {
-          // fitur lain tetap pakai FeaturePage dummy
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => FeaturePage(title: title),
-            ),
-          );
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ExploreProfilesPage()));
+        } else if (title == "Favorite Players") {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const FavoritePlayersPage()));
+        } else if (title == "Match Prediction") {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const MatchPredictionPage()));
+        } else if (title == "Discussion Forum") {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const DiscussionForumPage()));
         }
       },
       child: Card(
@@ -139,9 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -154,25 +183,6 @@ class _MyHomePageState extends State<MyHomePage> {
               const Icon(Icons.chevron_right),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// Halaman dummy untuk fitur yang belum diimplementasi
-class FeaturePage extends StatelessWidget {
-  final String title;
-  const FeaturePage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Text(
-          "$title Page",
-          style: const TextStyle(fontSize: 24),
         ),
       ),
     );

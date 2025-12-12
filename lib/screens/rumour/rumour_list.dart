@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-import '../models/rumour_entry.dart';
+import '../../models/rumour_entry.dart';
 import 'rumour_detail.dart';
 import 'rumour_form.dart';
-import '../widgets/left_drawer.dart';
+import '../../widgets/left_drawer.dart';
 
 
 class RumourListPage extends StatefulWidget {
