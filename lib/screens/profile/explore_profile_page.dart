@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-import '../models/ProfileEntry.dart';
+import '../../models/ProfileEntry.dart';
 import 'profile_detail_page.dart';
 
 class ExploreProfilesPage extends StatefulWidget {
