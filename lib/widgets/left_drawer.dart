@@ -4,7 +4,7 @@ import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour_list.dart';
 import 'package:goalytics_mobile/screens/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/explore_profile_page.dart';
-import 'package:goalytics_mobile/screens/forum/forum_home_screen.dart';
+import 'package:goalytics_mobile/screens/forum_home_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});

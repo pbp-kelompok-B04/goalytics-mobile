@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:goalytics_mobile/models/forum/forum_models.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
@@ -38,15 +40,17 @@ class ForumService {
     required String content,
     String league = 'EPL',
     String? mediaUrl,
+    String? attachmentUrl,
   }) async {
-    final resp = await request.post(
+    final resp = await request.postJson(
       '$baseUrl/forum/api/posts/create/',
-      {
+      jsonEncode({
         'title': title,
         'content': content,
         'league': league,
         if (mediaUrl != null) 'media_url': mediaUrl,
-      },
+        if (attachmentUrl != null) 'attachment_url': attachmentUrl,
+      }),
     );
     return ForumPost.fromJson(resp['data']);
   }
@@ -56,24 +60,28 @@ class ForumService {
     String? title,
     String? content,
     String? league,
+    String? attachmentUrl,
   }) async {
-    await request.post(
+    await request.postJson(
       '$baseUrl/forum/api/posts/$postId/update/',
-      {
-        'post_id': postId.toString(),
+      jsonEncode({
+        '_method': 'PATCH',
+        'post_id': postId,
         if (title != null) 'title': title,
         if (content != null) 'content': content,
         if (league != null) 'league': league,
-      },
+        if (attachmentUrl != null) 'attachment_url': attachmentUrl,
+      }),
     );
   }
 
   Future<void> deletePost(int postId) async {
-    await request.post(
+    await request.postJson(
       '$baseUrl/forum/api/posts/$postId/delete/',
-      {
-        'post_id': postId.toString(),
-      },
+      jsonEncode({
+        '_method': 'DELETE',
+        'post_id': postId,
+      }),
     );
   }
 
@@ -82,12 +90,12 @@ class ForumService {
     required String content,
     int? parentId,
   }) async {
-    final resp = await request.post(
+    final resp = await request.postJson(
       '$baseUrl/forum/api/posts/$postId/comments/create/',
-      {
+      jsonEncode({
         'content': content,
-        if (parentId != null) 'parent_id': parentId.toString(),
-      },
+        if (parentId != null) 'parent_id': parentId,
+      }),
     );
     return ForumComment.fromJson(resp['data']);
   }
@@ -97,13 +105,14 @@ class ForumService {
     required int commentId,
     required String content,
   }) async {
-    await request.post(
+    await request.postJson(
       '$baseUrl/forum/api/comments/$commentId/update/',
-      {
-        'post_id': postId.toString(),
-        'comment_id': commentId.toString(),
+      jsonEncode({
+        '_method': 'PATCH',
+        'post_id': postId,
+        'comment_id': commentId,
         'content': content,
-      },
+      }),
     );
   }
 
@@ -111,19 +120,20 @@ class ForumService {
     required int postId,
     required int commentId,
   }) async {
-    await request.post(
+    await request.postJson(
       '$baseUrl/forum/api/comments/$commentId/delete/',
-      {
-        'post_id': postId.toString(),
-        'comment_id': commentId.toString(),
-      },
+      jsonEncode({
+        '_method': 'DELETE',
+        'post_id': postId,
+        'comment_id': commentId,
+      }),
     );
   }
 
   Future<int> togglePostLike(int postId) async {
-    final resp = await request.post(
+    final resp = await request.postJson(
       '$baseUrl/forum/api/posts/$postId/likes/',
-      {'post_id': postId.toString()},
+      jsonEncode({'_method': 'PATCH', 'post_id': postId}),
     );
     return resp['like_count'] ?? 0;
   }
@@ -132,12 +142,13 @@ class ForumService {
     required int postId,
     required int commentId,
   }) async {
-    final resp = await request.post(
+    final resp = await request.postJson(
       '$baseUrl/forum/api/comments/$commentId/likes/',
-      {
-        'post_id': postId.toString(),
-        'comment_id': commentId.toString(),
-      },
+      jsonEncode({
+        '_method': 'PATCH',
+        'post_id': postId,
+        'comment_id': commentId,
+      }),
     );
     return resp['like_count'] ?? 0;
   }

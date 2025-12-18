@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/widgets/left_drawer.dart';
-import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour_list.dart';
 import 'package:goalytics_mobile/screens/explore_profile_page.dart';
 
@@ -92,11 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }) {
     return InkWell(
       onTap: () {
-        if (title == "Player Comparison") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const ComparisonScreen(),
         // Route spesifik per feature
         if (title == "Transfer Rumours") {
           Navigator.push(
