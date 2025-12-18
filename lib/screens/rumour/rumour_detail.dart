@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-import '../models/rumour_entry.dart';
+import '../../models/rumour_entry.dart';
 import 'rumour_form.dart';
 import 'rumour_list.dart';
-import '../widgets/left_drawer.dart';
+import '../../widgets/left_drawer.dart';
 
 
 class RumourDetailPage extends StatelessWidget {
