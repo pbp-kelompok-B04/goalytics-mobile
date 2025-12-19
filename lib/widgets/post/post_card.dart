@@ -79,7 +79,10 @@ class PostCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Text('•', style: TextStyle(color: Color(0xFFCBD5E1))),
+                        const Text(
+                          '•',
+                          style: TextStyle(color: Color(0xFFCBD5E1)),
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           postTimeAgo(post.createdAt),
@@ -91,19 +94,20 @@ class PostCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      post.title,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF0F172A),
-                        height: 1.3,
-                      ),
-                    ),
                   ],
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            post.title,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF0F172A),
+              height: 1.3,
+            ),
           ),
           const SizedBox(height: 12),
           if (mediaUrl != null) ...[
