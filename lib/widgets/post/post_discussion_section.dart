@@ -213,9 +213,9 @@ class _CommentForm extends StatelessWidget {
                 foregroundColor: Colors.white,
                 elevation: 4, // shadow-md
                 shadowColor: slate900.withOpacity(0.3),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               icon: sending
