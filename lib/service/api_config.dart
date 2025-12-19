@@ -1,3 +1,3 @@
 class ApiConfig {
-  static const String baseUrl = "http://localhost:8000"; 
+  static const String baseUrl = "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id"; 
 }

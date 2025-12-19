@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/ProfileEntry.dart';
 
-const String baseUrl = "http://localhost:8000"; 
+const String baseUrl = "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id"; 
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});

@@ -70,7 +70,7 @@ class _RumourFormPageState extends State<RumourFormPage> {
       'cover_image_url': _coverImageUrlController.text.trim(),
     };
 
-    final baseUrl = 'http://localhost:8000/transfer-rumours';
+    final baseUrl = 'https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id/transfer-rumours';
 
     final url = isEdit
         ? '$baseUrl/${widget.existingRumour!.slug}/update-flutter/'

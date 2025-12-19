@@ -15,7 +15,7 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
   bool _loading = true;
   Map<String, dynamic>? data;
 
-  static const String baseUrl = "http://localhost:8000"; 
+  static const String baseUrl = "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id"; 
 
   @override
   void initState() {
