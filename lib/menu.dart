@@ -8,7 +8,7 @@ import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
 import 'package:goalytics_mobile/screens/favorite_player/favorite_players.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
-import 'package:goalytics_mobile/screens/discussion/discussion_forum.dart';
+import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -55,8 +55,11 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialPageRoute(builder: (_) => const MatchPredictionPage()));
         break;
       case 3:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const DiscussionForumPage()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) =>
+                    ForumHomeScreen(username: username ?? 'GoalyticsUser')));
         break;
       case 4:
         Navigator.push(context,
@@ -167,8 +170,11 @@ class _MyHomePageState extends State<MyHomePage> {
           Navigator.push(context,
               MaterialPageRoute(builder: (_) => const MatchPredictionPage()));
         } else if (title == "Discussion Forum") {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const DiscussionForumPage()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      ForumHomeScreen(username: username ?? 'GoalyticsUser')));
         }
       },
       child: Card(

@@ -4,6 +4,7 @@ import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
+import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -17,9 +18,7 @@ class LeftDrawer extends StatelessWidget {
         children: [
           // ===================== HEADER =====================
           DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Color(0xff1c2341),
-            ),
+            decoration: const BoxDecoration(color: Color(0xff1c2341)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
@@ -40,10 +39,7 @@ class LeftDrawer extends StatelessWidget {
                 SizedBox(height: 4),
                 Text(
                   "Your football companion",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white70),
                 ),
               ],
             ),
@@ -110,7 +106,13 @@ class LeftDrawer extends StatelessWidget {
             icon: Icons.forum,
             title: "Discussion Forum",
             onTap: () {
-              // TODO: Routing nanti
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const ForumHomeScreen(withSidebar: true),
+                ),
+              );
             },
           ),
 
