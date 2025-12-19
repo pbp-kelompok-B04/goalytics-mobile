@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/models/forum/forum_models.dart';
+import 'package:goalytics_mobile/screens/post_detail_screen.dart';
 import 'package:goalytics_mobile/widgets/post/post_helpers.dart';
 
 class ForumNotificationSheet extends StatelessWidget {
@@ -123,10 +124,25 @@ class ForumNotificationSheet extends StatelessWidget {
                                 ],
                         ),
                         child: InkWell(
-                           // Jika mau handle klik notifikasi
                           onTap: () {
-                             // Logika navigasi ke detail post bisa ditaruh sini
-                          }, 
+                            if (n.postId != null) {
+                              Navigator.pop(context); // Close the sheet
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PostDetailScreen(
+                                    postId: n.postId!,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('This notification has no target post'),
+                                ),
+                              );
+                            }
+                          },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
