@@ -471,9 +471,8 @@ void _confirmDelete(ForumComment comment) {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forum'),
-        backgroundColor: const Color(0xff1c2341),
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF8FAFC),
+        foregroundColor: Colors.black,
       ),
       drawer: const LeftDrawer(),
       body: page,
