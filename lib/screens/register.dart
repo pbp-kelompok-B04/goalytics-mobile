@@ -164,7 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: ElevatedButton(
                       onPressed: () async {
                         final response = await request.postJson(
-                          "http://localhost:8000/auth/register/",
+                          "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id/auth/register/",
                           jsonEncode({
                             "username": _usernameController.text,
                             "password1": _passwordController.text,

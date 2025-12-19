@@ -18,7 +18,7 @@ class RumourListPage extends StatefulWidget {
 class _RumourListPageState extends State<RumourListPage> {
   Future<List<RumourEntry>> fetchRumours(CookieRequest request) async {
     final response =
-        await request.get('http://localhost:8000//transfer-rumours/json/');
+        await request.get('https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id//transfer-rumours/json/');
 
     List<RumourEntry> rumourList = [];
     for (var item in response) {

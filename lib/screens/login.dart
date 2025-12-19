@@ -183,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: ElevatedButton(
                           onPressed: () async {
                             final response = await request.login(
-                              "http://localhost:8000/auth/login/",
+                              "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id/auth/login/",
                               {
                                 'username': _usernameController.text,
                                 'password': _passwordController.text,
