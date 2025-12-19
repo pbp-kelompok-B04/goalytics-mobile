@@ -22,12 +22,10 @@ class ForumListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Logika media url
     final mediaUrl = post.attachmentUrl?.isNotEmpty == true
         ? post.attachmentUrl
         : post.mediaUrl;
 
-    // Palet Warna (Tailwind CSS Slate Equivalent)
     const slate900 = Color(0xFF0F172A);
     const slate600 = Color(0xFF475569);
     const slate500 = Color(0xFF64748B);
@@ -55,7 +53,6 @@ class ForumListCard extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // --- MAIN LAYOUT (Avatar Left + Content Right) ---
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -64,13 +61,11 @@ class ForumListCard extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 16.0),
                   child: buildPostAvatar(post.author, post.avatar, size: 48),
                 ),
-
                 // 2. CONTENT SECTION
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // HEADER: Judul + Badge (Menggunakan Wrap agar responsif)
                       Padding(
                         // Padding kanan ekstra agar teks tidak tertutup tombol Edit/Delete
                         padding: EdgeInsets.only(
@@ -117,7 +112,7 @@ class ForumListCard extends StatelessWidget {
                         ),
                       ),
 
-                      // MEDIA PREVIEW (Jika ada, di render di bawah judul)
+                      const SizedBox(height: 12),
                       if (mediaUrl != null) ...[
                         const SizedBox(height: 12),
                         ClipRRect(
@@ -219,8 +214,8 @@ class ForumListCard extends StatelessWidget {
            
             if (post.isAuthor && (onEdit != null || onDelete != null))
               Positioned(
-                right: -4, 
-                top: -4,
+                right: 1, 
+                top: 1,
                 child: Row(
                   children: [
                     if (onEdit != null)
@@ -234,8 +229,8 @@ class ForumListCard extends StatelessWidget {
                         icon: Icons.delete_outline,
                         onTap: onDelete!,
                         tooltip: 'Delete post',
-                        color: const Color(0xFFF43F5E), // rose-500
-                        bgColor: const Color(0xFFFFF1F2), // rose-50
+                        color: const Color(0xFFF43F5E), 
+                        bgColor: const Color(0xFFFFF1F2), 
                       ),
                   ],
                 ),
@@ -247,7 +242,7 @@ class ForumListCard extends StatelessWidget {
   }
 }
 
-// Widget Helper untuk tombol Edit/Delete kecil
+
 class _IconButton extends StatelessWidget {
   const _IconButton({
     required this.icon,
@@ -280,7 +275,7 @@ class _IconButton extends StatelessWidget {
         ),
         child: Icon(
           icon,
-          size: 16,
+          size: 13,
           color: color ?? const Color(0xFF64748B), 
         ),
       ),

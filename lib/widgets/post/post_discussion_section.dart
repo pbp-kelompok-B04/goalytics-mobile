@@ -30,7 +30,6 @@ class PostDiscussionSection extends StatelessWidget {
   final ValueChanged<ForumComment> onEditComment;
   final ValueChanged<ForumComment> onDeleteComment;
 
-  // Colors based on Tailwind Slate
   static const Color slate50 = Color(0xFFF8FAFC);
   static const Color slate200 = Color(0xFFE2E8F0);
   static const Color slate400 = Color(0xFF94A3B8);
@@ -41,14 +40,14 @@ class PostDiscussionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24), // p-6
+      padding: const EdgeInsets.all(24), 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24), // rounded-3xl
-        border: Border.all(color: slate200), // border-slate-200
+        borderRadius: BorderRadius.circular(24), 
+        border: Border.all(color: slate200),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x08000000), // shadow-sm (subtle)
+            color: Color(0x08000000), 
             blurRadius: 2,
             offset: Offset(0, 1),
           ),
@@ -86,38 +85,36 @@ class PostDiscussionSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // Count Badge
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: slate50, // bg-slate-50
-                  borderRadius: BorderRadius.circular(50), // rounded-full
+                  color: slate50, 
+                  borderRadius: BorderRadius.circular(50),
                   border: Border.all(color: slate200),
                 ),
                 child: Text(
-                  '$commentCount Comments', // Just number mostly, or number + label
+                  '$commentCount Comments', 
                   style: const TextStyle(
                     fontSize: 12, // text-xs
-                    fontWeight: FontWeight.w600, // font-semibold
-                    color: slate400, // text-slate-400
+                    fontWeight: FontWeight.w600, 
+                    color: slate400, 
                   ),
                 ),
               ),
             ],
           ),
           
-          const SizedBox(height: 24), // mb-6 (Header to form)
+          const SizedBox(height: 24), 
 
-          // --- COMMENT FORM ---
+         
           _CommentForm(
             controller: commentController,
             onSend: onSendComment,
             sending: sendingComment,
           ),
 
-          const SizedBox(height: 16), // space-y-4 (Form to list)
+          const SizedBox(height: 16), 
 
-          // --- COMMENT LIST ---
           _CommentList(
             comments: comments,
             collapsedReplies: collapsedReplies,
@@ -268,7 +265,6 @@ class _CommentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Empty state: rounded-3xl border border-slate-200 bg-slate-50 py-10
     if (comments.isEmpty) {
       return Container(
         width: double.infinity,
