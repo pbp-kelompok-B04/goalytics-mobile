@@ -12,13 +12,25 @@ class ForumNotificationSheet extends StatelessWidget {
   final List<ForumNotification> notifications;
   final VoidCallback onMarkRead;
 
+  // Palet Warna Tailwind Slate
+  static const Color slate50 = Color(0xFFF8FAFC);
+  static const Color slate100 = Color(0xFFF1F5F9);
+  static const Color slate200 = Color(0xFFE2E8F0);
+  static const Color slate400 = Color(0xFF94A3B8);
+  static const Color slate500 = Color(0xFF64748B);
+  static const Color slate700 = Color(0xFF334155);
+  static const Color slate900 = Color(0xFF0F172A);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      // Menyesuaikan tinggi maksimal agar tidak terlalu penuh
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.8,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)), // rounded-3xl
         boxShadow: [
           BoxShadow(
             color: Color(0x1A000000),
@@ -31,73 +43,133 @@ class ForumNotificationSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Notifications',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF0F172A),
+          // --- Header Section ---
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Notifications',
+                  style: TextStyle(
+                    fontSize: 18, // text-lg
+                    fontWeight: FontWeight.w600, // font-semibold
+                    color: slate900,
+                  ),
                 ),
-              ),
-              TextButton(
-                onPressed: onMarkRead,
-                child: const Text('Mark all read'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          if (notifications.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Center(
-                child: Text(
-                  'No notifications yet.',
-                  style: TextStyle(color: Color(0xFF94A3B8)),
-                ),
-              ),
-            )
-          else
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 400),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: notifications.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final n = notifications[index];
-                  return ListTile(
-                    dense: true,
-                    leading: Icon(
-                      n.isRead
-                          ? Icons.notifications_none
-                          : Icons.notifications_active,
-                      color: n.isRead
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF0F172A),
-                    ),
-                    title: Text(
-                      '${n.actor} ${n.verb}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: n.isRead
-                            ? const Color(0xFF475569)
-                            : const Color(0xFF0F172A),
+                // Tombol Close (Bulat seperti di HTML)
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: slate100, // bg-slate-100
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 20,
+                        color: slate500, // text-slate-500
                       ),
                     ),
-                    subtitle: Text(
-                      postTimeAgo(n.createdAt),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF94A3B8),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
+          ),
+          
+          const Divider(height: 1, color: slate200), // Border bottom header
+
+          // --- List Section ---
+          Flexible(
+            child: notifications.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(
+                      child: Text(
+                        'No notifications yet.',
+                        style: TextStyle(color: slate400),
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(24),
+                    shrinkWrap: true,
+                    itemCount: notifications.length,
+                    itemBuilder: (context, index) {
+                      final n = notifications[index];
+                      // Item Style: rounded-2xl border border-slate-200 bg-slate-50
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: n.isRead ? slate50 : Colors.white,
+                          borderRadius: BorderRadius.circular(16), // rounded-2xl
+                          border: Border.all(
+                            color: n.isRead ? slate200 : const Color(0xFFCBD5E1),
+                          ),
+                          // Efek hover diwakili oleh sedikit shadow jika belum dibaca
+                          boxShadow: n.isRead
+                              ? []
+                              : [
+                                  BoxShadow(
+                                    color: slate900.withOpacity(0.05),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  )
+                                ],
+                        ),
+                        child: InkWell(
+                           // Jika mau handle klik notifikasi
+                          onTap: () {
+                             // Logika navigasi ke detail post bisa ditaruh sini
+                          }, 
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Rich Text: Actor (Bold) + Verb
+                              RichText(
+                                text: TextSpan(
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: slate700,
+                                    height: 1.4,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: n.actor,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600, // font-semibold
+                                        color: slate900,
+                                      ),
+                                    ),
+                                    TextSpan(text: ' ${n.verb}'),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              // Date
+                              Text(
+                                postTimeAgo(n.createdAt), // format waktu
+                                style: const TextStyle(
+                                  fontSize: 12, // text-xs
+                                  color: slate400, // text-slate-400
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+          
+          // Opsional: Tombol "Mark all read" disembunyikan agar visual match HTML.
+          // Namun, jika ingin fungsi itu berjalan otomatis saat dibuka (seperti JS),
+          // Anda bisa memanggil `onMarkRead()` di parent widget atau di initState stateful widget.
         ],
       ),
     );

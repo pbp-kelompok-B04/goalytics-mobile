@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/widgets/post/post_helpers.dart';
 
+// --- Model Result (Tetap sama) ---
 class ForumEditorResult {
   ForumEditorResult({
     required this.title,
@@ -17,6 +17,7 @@ class ForumEditorResult {
   final String? attachmentUrl;
 }
 
+// --- Main Widget ---
 class ForumEditorSheet extends StatefulWidget {
   const ForumEditorSheet({
     super.key,
@@ -44,6 +45,14 @@ class _ForumEditorSheetState extends State<ForumEditorSheet> {
   late final TextEditingController _attachmentCtrl;
   late String _league;
 
+  // Palet Warna Tailwind Slate (Approximation)
+  static const Color slate50 = Color(0xFFF8FAFC);
+  static const Color slate100 = Color(0xFFF1F5F9);
+  static const Color slate200 = Color(0xFFE2E8F0);
+  static const Color slate400 = Color(0xFF94A3B8);
+  static const Color slate600 = Color(0xFF475569);
+  static const Color slate900 = Color(0xFF0F172A);
+
   @override
   void initState() {
     super.initState();
@@ -64,226 +73,311 @@ class _ForumEditorSheetState extends State<ForumEditorSheet> {
     super.dispose();
   }
 
+  void _onSubmit() {
+    if (_titleCtrl.text.trim().isEmpty || _contentCtrl.text.trim().isEmpty) {
+      // Validasi sederhana, bisa tambah snackbar error disini
+      return;
+    }
+    Navigator.of(context).pop(
+      ForumEditorResult(
+        title: _titleCtrl.text.trim(),
+        content: _contentCtrl.text.trim(),
+        league: _league,
+        mediaUrl:
+            _mediaCtrl.text.trim().isEmpty ? null : _mediaCtrl.text.trim(),
+        attachmentUrl: _attachmentCtrl.text.trim().isEmpty
+            ? null
+            : _attachmentCtrl.text.trim(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.of(context).viewInsets.bottom;
-    return Padding(
-      padding: EdgeInsets.only(bottom: bottom),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x1A000000),
-              blurRadius: 24,
-              offset: Offset(0, 12),
+    // Menangani keyboard overlap
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final isEditing = widget.initialTitle.isNotEmpty;
+
+    return Container(
+      // Batasi tinggi maksimal agar tidak memenuhi layar penuh
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
+      padding: EdgeInsets.only(bottom: bottomInset),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)), // rounded-3xl
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // --- Header ---
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: slate200)),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.initialTitle.isEmpty ? 'Create New Post' : 'Edit Post',
+                  isEditing ? 'Edit Post' : 'Create New Post',
                   style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF0F172A),
+                    fontSize: 20, // text-xl
+                    fontWeight: FontWeight.w600, // font-semibold
+                    color: slate900,
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close),
+                // Tombol Close Bulat (Tailwind: rounded-full bg-slate-100 p-2)
+                InkWell(
+                  onTap: () => Navigator.of(context).pop(),
+                  borderRadius: BorderRadius.circular(50),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: slate100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close, size: 20, color: slate600),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            _DropdownField(
-              value: _league,
-              onChanged: (val) {
-                if (val != null) setState(() => _league = val);
-              },
+          ),
+
+          // --- Form Content (Scrollable) ---
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // League Dropdown
+                  _TailwindLabel(label: 'League'),
+                  _TailwindDropdown(
+                    value: _league,
+                    onChanged: (val) {
+                      if (val != null) setState(() => _league = val);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Title Input
+                  _TailwindLabel(label: 'Title'),
+                  _TailwindInput(
+                    controller: _titleCtrl,
+                    hint: "What's on your mind?",
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Content Input
+                  _TailwindLabel(label: 'Content'),
+                  _TailwindInput(
+                    controller: _contentCtrl,
+                    hint: 'Share your thoughts with the community...',
+                    maxLines: 6,
+                    minLines: 4,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Media URL
+                  _TailwindLabel(label: 'Media URL (optional)'),
+                  _TailwindInput(
+                    controller: _mediaCtrl,
+                    hint: 'Paste image/video link (e.g. YouTube, Imgur)',
+                    textInputType: TextInputType.url,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Attachment URL
+                  _TailwindLabel(label: 'Attachment (optional)'),
+                  // Kita styling mirip input file di HTML tapi fungsinya tetap text field URL
+                  // karena backend logic flutter Anda menggunakan string URL
+                  _TailwindInput(
+                    controller: _attachmentCtrl,
+                    hint: 'Paste attachment URL',
+                    textInputType: TextInputType.url,
+                    prefixIcon: const Icon(Icons.link, color: slate400, size: 20),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'You can paste a direct link to an image or video file.',
+                    style: TextStyle(fontSize: 12, color: slate400),
+                  ),
+                  
+                  const SizedBox(height: 32), // Jarak ke tombol bawah
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            _TextField(
-              controller: _titleCtrl,
-              label: 'Title',
-              hint: "What's on your mind?",
-              maxLines: 1,
-            ),
-            const SizedBox(height: 12),
-            _TextField(
-              controller: _contentCtrl,
-              label: 'Content',
-              hint: 'Share your thoughts with the community...',
-              maxLines: 5,
-            ),
-            const SizedBox(height: 12),
-            _TextField(
-              controller: _mediaCtrl,
-              label: 'Media URL (optional)',
-              hint: 'Paste image/video link (e.g. YouTube)',
-              maxLines: 1,
-            ),
-            const SizedBox(height: 12),
-            _TextField(
-              controller: _attachmentCtrl,
-              label: 'Attachment URL (optional)',
-              hint: 'Paste image/video link for attachment',
-              maxLines: 1,
-            ),
-            const SizedBox(height: 16),
-            Row(
+          ),
+
+          // --- Footer Buttons ---
+          Container(
+            padding: const EdgeInsets.all(24),
+            // Opsional: border top jika ingin persis seperti modal footer
+            // decoration: const BoxDecoration(border: Border(top: BorderSide(color: slate200))), 
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                // Cancel Button
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0F172A),
-                    foregroundColor: Colors.white,
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(16), // rounded-2xl
+                      side: const BorderSide(color: slate200),
+                    ),
+                    foregroundColor: slate600,
+                  ),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                
+                // Submit Button
+                ElevatedButton(
+                  onPressed: _onSubmit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: slate900,
+                    foregroundColor: Colors.white,
+                    elevation: 2, // shadow-md
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16), // rounded-2xl
                     ),
                   ),
-                  onPressed: () {
-                    if (_titleCtrl.text.trim().isEmpty ||
-                        _contentCtrl.text.trim().isEmpty) {
-                      return;
-                    }
-                    Navigator.of(context).pop(
-                      ForumEditorResult(
-                        title: _titleCtrl.text.trim(),
-                        content: _contentCtrl.text.trim(),
-                        league: _league,
-                        mediaUrl: _mediaCtrl.text.trim().isEmpty
-                            ? null
-                            : _mediaCtrl.text.trim(),
-                        attachmentUrl: _attachmentCtrl.text.trim().isEmpty
-                            ? null
-                            : _attachmentCtrl.text.trim(),
-                      ),
-                    );
-                  },
-                  child: const Text('Save'),
+                  child: Text(
+                    isEditing ? 'Save Changes' : 'Publish Post',
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
                 ),
               ],
             ),
-          ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+// --- Helper Widgets untuk Styling Tailwind ---
+
+class _TailwindLabel extends StatelessWidget {
+  final String label;
+  const _TailwindLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 14, // text-sm
+          fontWeight: FontWeight.w500, // font-medium
+          color: Color(0xFF475569), // text-slate-600
         ),
       ),
     );
   }
 }
 
-class _TextField extends StatelessWidget {
-  const _TextField({
-    required this.controller,
-    required this.label,
-    required this.hint,
-    required this.maxLines,
-  });
-
+class _TailwindInput extends StatelessWidget {
   final TextEditingController controller;
-  final String label;
   final String hint;
   final int maxLines;
+  final int minLines;
+  final TextInputType? textInputType;
+  final Widget? prefixIcon;
+
+  const _TailwindInput({
+    required this.controller,
+    required this.hint,
+    this.maxLines = 1,
+    this.minLines = 1,
+    this.textInputType,
+    this.prefixIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
-          ),
+    // Warna focus ring (slate-400 approximation)
+    const focusColor = Color(0xFF94A3B8); 
+    const bgColor = Color(0xFFF8FAFC); // slate-50
+    const borderColor = Color(0xFFE2E8F0); // slate-200
+
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      minLines: minLines,
+      keyboardType: textInputType,
+      style: const TextStyle(
+        fontSize: 14, // text-sm
+        color: Color(0xFF334155), // slate-700
+      ),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Color(0xFF94A3B8)), // placeholder-slate-400
+        filled: true,
+        fillColor: bgColor,
+        prefixIcon: prefixIcon,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16), // rounded-2xl
+          borderSide: const BorderSide(color: borderColor),
         ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: controller,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: focusColor, width: 1.5),
         ),
-      ],
+      ),
     );
   }
 }
 
-class _DropdownField extends StatelessWidget {
-  const _DropdownField({
-    required this.value,
-    required this.onChanged,
-  });
-
+class _TailwindDropdown extends StatelessWidget {
   final String value;
   final ValueChanged<String?> onChanged;
 
+  const _TailwindDropdown({required this.value, required this.onChanged});
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'League',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
-          ),
+    const focusColor = Color(0xFF94A3B8);
+    const bgColor = Color(0xFFF8FAFC);
+    const borderColor = Color(0xFFE2E8F0);
+
+    return DropdownButtonFormField<String>(
+      value: value,
+      onChanged: onChanged,
+      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B)),
+      style: const TextStyle(
+        fontSize: 14,
+        color: Color(0xFF334155), // slate-700
+        fontWeight: FontWeight.normal,
+      ),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: bgColor,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: borderColor),
         ),
-        const SizedBox(height: 6),
-        DropdownButtonFormField<String>(
-          value: value,
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          ),
-          items: const [
-            DropdownMenuItem(value: 'EPL', child: Text('Premier League')),
-            DropdownMenuItem(value: 'LALIGA', child: Text('La Liga')),
-            DropdownMenuItem(value: 'SERIEA', child: Text('Serie A')),
-            DropdownMenuItem(value: 'BUNDES', child: Text('Bundesliga')),
-            DropdownMenuItem(value: 'LIGUE1', child: Text('Ligue 1')),
-          ],
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: focusColor, width: 1.5),
         ),
+      ),
+      items: const [
+        DropdownMenuItem(value: 'EPL', child: Text('Premier League')),
+        DropdownMenuItem(value: 'LALIGA', child: Text('La Liga')),
+        DropdownMenuItem(value: 'SERIEA', child: Text('Serie A')),
+        DropdownMenuItem(value: 'BUNDES', child: Text('Bundesliga')),
+        DropdownMenuItem(value: 'LIGUE1', child: Text('Ligue 1')),
       ],
     );
   }
