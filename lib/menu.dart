@@ -8,7 +8,7 @@ import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
 import 'package:goalytics_mobile/screens/favorite_player/favorite_players.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
-import 'package:goalytics_mobile/screens/forum_home_screen.dart';
+import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});

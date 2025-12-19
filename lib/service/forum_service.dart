@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:goalytics_mobile/models/forum/forum_models.dart';
+import 'package:goalytics_mobile/models/forum_models.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class ForumService {

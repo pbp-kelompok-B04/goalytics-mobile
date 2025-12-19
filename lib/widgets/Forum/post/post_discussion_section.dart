@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/models/forum/forum_models.dart';
-import 'package:goalytics_mobile/widgets/post/post_comment_tile.dart';
+import 'package:goalytics_mobile/models/forum_models.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_comment_tile.dart';
 
 class PostDiscussionSection extends StatelessWidget {
   const PostDiscussionSection({

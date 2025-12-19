@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/config.dart';
-import 'package:goalytics_mobile/models/forum/forum_models.dart';
+import 'package:goalytics_mobile/models/forum_models.dart';
 import 'package:goalytics_mobile/service/forum_service.dart';
-import 'package:goalytics_mobile/widgets/post/post_action_sheet.dart';
-import 'package:goalytics_mobile/widgets/post/post_back_button.dart';
-import 'package:goalytics_mobile/widgets/post/post_card.dart';
-import 'package:goalytics_mobile/widgets/post/post_discussion_section.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_action_sheet.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_back_button.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_card.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_discussion_section.dart';
 import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:goalytics_mobile/widgets/post/post_delete_sheet.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_delete_sheet.dart';
 
 class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({

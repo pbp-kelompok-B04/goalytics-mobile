@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/config.dart';
-import 'package:goalytics_mobile/models/forum/forum_models.dart';
-import 'package:goalytics_mobile/screens/post_detail_screen.dart';
+import 'package:goalytics_mobile/models/forum_models.dart';
+import 'package:goalytics_mobile/screens/discussion/post_detail_screen.dart';
 import 'package:goalytics_mobile/service/forum_service.dart';
-import 'package:goalytics_mobile/widgets/forum/forum_editor_sheet.dart';
-import 'package:goalytics_mobile/widgets/forum/forum_home_content.dart';
-import 'package:goalytics_mobile/widgets/forum/forum_notification_sheet.dart';
+import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_editor_sheet.dart';
+import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_home_content.dart';
+import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_notification_sheet.dart';
 import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:goalytics_mobile/widgets/post/post_delete_sheet.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_delete_sheet.dart';
 
 class ForumHomeScreen extends StatefulWidget {
   const ForumHomeScreen({
@@ -278,9 +278,8 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forum'),
-        backgroundColor: const Color(0xff1c2341),
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF8FAFC),
+        foregroundColor: Colors.black,
       ),
       drawer: const LeftDrawer(),
       backgroundColor: const Color(0xFFF8FAFC),

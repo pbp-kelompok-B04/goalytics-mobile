@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/models/forum/forum_models.dart';
-import 'package:goalytics_mobile/widgets/forum/forum_filters.dart';
-import 'package:goalytics_mobile/widgets/forum/forum_home_header.dart';
-import 'package:goalytics_mobile/widgets/forum/forum_list_card.dart';
-import 'package:goalytics_mobile/widgets/forum/forum_states.dart';
+import 'package:goalytics_mobile/models/forum_models.dart';
+import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_filters.dart';
+import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_home_header.dart';
+import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_list_card.dart';
+import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_states.dart';
 
 typedef ForumPostCallback = void Function(ForumPost post);
 

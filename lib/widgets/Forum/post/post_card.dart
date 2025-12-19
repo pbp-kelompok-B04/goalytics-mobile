@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/models/forum/forum_models.dart';
-import 'package:goalytics_mobile/widgets/post/post_helpers.dart';
-import 'package:goalytics_mobile/widgets/post/post_like_button.dart';
-import 'package:goalytics_mobile/widgets/post/post_media_preview.dart';
+import 'package:goalytics_mobile/models/forum_models.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_helpers.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_like_button.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_media_preview.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({

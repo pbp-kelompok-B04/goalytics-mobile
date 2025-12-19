@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/models/forum/forum_models.dart';
-import 'package:goalytics_mobile/screens/post_detail_screen.dart';
-import 'package:goalytics_mobile/widgets/post/post_helpers.dart';
+import 'package:goalytics_mobile/models/forum_models.dart';
+import 'package:goalytics_mobile/screens/discussion/post_detail_screen.dart';
+import 'package:goalytics_mobile/widgets/Forum/post/post_helpers.dart';
 
 class ForumNotificationSheet extends StatelessWidget {
   const ForumNotificationSheet({
