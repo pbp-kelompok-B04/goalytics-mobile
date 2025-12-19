@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/config.dart';
+import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/models/forum_models.dart';
 import 'package:goalytics_mobile/service/forum_service.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_action_sheet.dart';
@@ -59,7 +59,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   Future<void> _loadWithSpinner({bool showSpinner = false}) async {
     if (showSpinner && mounted) setState(() => _loading = true);
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     try {
       final post = await service.getPost(widget.postId);
       final comments = await service.getComments(widget.postId);
@@ -88,7 +88,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     if (content.trim().isEmpty || _sendingComment) return;
     setState(() => _sendingComment = true);
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     try {
       await service.createComment(
         postId: widget.postId,
@@ -111,7 +111,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     if (_post == null || _likingPost) return;
     setState(() => _likingPost = true);
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     try {
       final likeCount = await service.togglePostLike(_post!.id);
       if (!mounted) return;
@@ -130,7 +130,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   Future<void> _toggleCommentLike(ForumComment comment) async {
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     try {
       final likeCount = await service.toggleCommentLike(
         postId: widget.postId,
@@ -149,7 +149,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final trimmed = content.trim();
     if (trimmed.isEmpty) return;
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     try {
       await service.updateComment(
         postId: widget.postId,
@@ -166,7 +166,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   Future<void> _deleteComment(ForumComment comment) async {
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     try {
       await service.deleteComment(
         postId: widget.postId,

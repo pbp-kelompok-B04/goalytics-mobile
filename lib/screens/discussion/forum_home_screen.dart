@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/config.dart';
+import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/models/forum_models.dart';
 import 'package:goalytics_mobile/screens/discussion/post_detail_screen.dart';
 import 'package:goalytics_mobile/service/forum_service.dart';
@@ -51,7 +51,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     try {
       final posts = await service.fetchPosts(
         league: _league.isEmpty ? null : _league,
@@ -72,7 +72,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
 
   Future<void> _markNotificationsRead() async {
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     await service.markNotificationsRead();
     setState(() {
       _notifUnread = false;
@@ -117,7 +117,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
 
     if (result == null) return;
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     await service.createPost(
       title: result.title,
       content: result.content,
@@ -160,7 +160,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
     );
     if (result == null) return;
     final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
+    final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
     await service.updatePost(
       postId: post.id,
       title: result.title,
@@ -187,7 +187,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
             Navigator.of(ctx).pop();
             try {
               final req = context.read<CookieRequest>();
-              final service = ForumService(req, baseUrl: kApiBaseUrl);
+              final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
 
               await service.deletePost(post.id);
 
@@ -251,7 +251,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
           },
           onPostLike: (p) async {
             final req = context.read<CookieRequest>();
-            final service = ForumService(req, baseUrl: kApiBaseUrl);
+            final service = ForumService(req, baseUrl: ApiConfig.baseUrl);
             final likeCount = await service.togglePostLike(p.id);
             setState(() {
               _posts = _posts

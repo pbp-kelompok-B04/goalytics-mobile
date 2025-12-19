@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:goalytics_mobile/config.dart';
 import 'package:goalytics_mobile/menu.dart';
 import 'package:goalytics_mobile/screens/register.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
