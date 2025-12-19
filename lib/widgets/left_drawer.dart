@@ -6,26 +6,28 @@ import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
 import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
 
+const Color primaryDark = Color(0xFF0F172A);
+
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xff1c2341),
+      backgroundColor: primaryDark,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           // ===================== HEADER =====================
           DrawerHeader(
-            decoration: const BoxDecoration(color: Color(0xff1c2341)),
+            decoration: const BoxDecoration(color: primaryDark),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 CircleAvatar(
                   radius: 26,
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.sports_soccer, color: Colors.black),
+                  child: Icon(Icons.sports_soccer, color: primaryDark),
                 ),
                 SizedBox(height: 12),
                 Text(
@@ -80,7 +82,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const RumourListPage(),
+                  builder: (_) => const RumourListPage(),
                 ),
               );
             },
@@ -89,17 +91,13 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.favorite,
             title: "Favorite Players",
-            onTap: () {
-              // TODO: Routing nanti
-            },
+            onTap: () {},
           ),
 
           _drawerItem(
             icon: Icons.psychology,
             title: "Match Prediction",
-            onTap: () {
-              // TODO: Routing nanti
-            },
+            onTap: () {},
           ),
 
           _drawerItem(
@@ -109,7 +107,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
+                  builder: (_) =>
                       const ForumHomeScreen(withSidebar: true),
                 ),
               );
@@ -123,7 +121,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ComparisonScreen(),
+                  builder: (_) => const ComparisonScreen(),
                 ),
               );
             },
@@ -147,16 +145,14 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.settings_outlined,
             title: "Settings",
-            onTap: () {
-              // TODO: Routing nanti
-            },
+            onTap: () {},
           ),
 
           _drawerItem(
             icon: Icons.logout,
             title: "Logout",
             onTap: () {
-              // TODO: Nanti diisi logic logout (hapus session, balik ke LoginPage)
+              // TODO: logout logic
             },
           ),
         ],

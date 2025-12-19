@@ -16,15 +16,12 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  // Hover states
   bool _hoverRegister = false;
   bool _hoverLoginText = false;
-
-  // Hover states input field
   bool _hoverUsername = false;
   bool _hoverPassword = false;
   bool _hoverConfirm = false;
-
-  // Hover icon mata (dipisah)
   bool _hoverEyePassword = false;
   bool _hoverEyeConfirm = false;
 
@@ -50,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title
+                // ================= TITLE =================
                 const Center(
                   child: Column(
                     children: [
@@ -59,16 +56,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
                         ),
                       ),
                       SizedBox(height: 4),
                       Text(
                         "Join the Goalytics community",
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.black54),
                       ),
                     ],
                   ),
@@ -76,13 +69,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 28),
 
-                // Username
+                // ================= USERNAME =================
                 const Text("Username",
                     style: TextStyle(fontSize: 13, color: Colors.black87)),
                 const SizedBox(height: 6),
                 _hoverableInput(
                   hover: _hoverUsername,
-                  onHover: (value) => setState(() => _hoverUsername = value),
+                  onHover: (v) => setState(() => _hoverUsername = v),
                   controller: _usernameController,
                   hint: "Create username",
                   icon: Icons.person_outline,
@@ -90,71 +83,53 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 18),
 
-                // Password
+                // ================= PASSWORD =================
                 const Text("Password",
                     style: TextStyle(fontSize: 13, color: Colors.black87)),
                 const SizedBox(height: 6),
                 _hoverableInput(
                   hover: _hoverPassword,
-                  onHover: (value) => setState(() => _hoverPassword = value),
+                  onHover: (v) => setState(() => _hoverPassword = v),
                   controller: _passwordController,
                   hint: "Create password",
                   icon: Icons.lock_outline,
                   obscure: !_showPassword,
-                  suffixIcon: MouseRegion(
-                    onEnter: (_) => setState(() => _hoverEyePassword = true),
-                    onExit: (_) => setState(() => _hoverEyePassword = false),
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () =>
-                          setState(() => _showPassword = !_showPassword),
-                      child: Icon(
-                        _showPassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: _hoverEyePassword
-                            ? const Color(0xFF1A2048)
-                            : Colors.grey,
-                      ),
-                    ),
+                  suffixIcon: _eyeIcon(
+                    hovered: _hoverEyePassword,
+                    onHover: (v) =>
+                        setState(() => _hoverEyePassword = v),
+                    onTap: () =>
+                        setState(() => _showPassword = !_showPassword),
+                    visible: _showPassword,
                   ),
                 ),
 
                 const SizedBox(height: 18),
 
-                // Confirm password
+                // ================= CONFIRM PASSWORD =================
                 const Text("Confirm Password",
                     style: TextStyle(fontSize: 13, color: Colors.black87)),
                 const SizedBox(height: 6),
                 _hoverableInput(
                   hover: _hoverConfirm,
-                  onHover: (value) => setState(() => _hoverConfirm = value),
+                  onHover: (v) => setState(() => _hoverConfirm = v),
                   controller: _confirmPasswordController,
                   hint: "Confirm password",
                   icon: Icons.lock_outline,
                   obscure: !_showConfirmPassword,
-                  suffixIcon: MouseRegion(
-                    onEnter: (_) => setState(() => _hoverEyeConfirm = true),
-                    onExit: (_) => setState(() => _hoverEyeConfirm = false),
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () => setState(
-                          () => _showConfirmPassword = !_showConfirmPassword),
-                      child: Icon(
-                        _showConfirmPassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: _hoverEyeConfirm
-                            ? const Color(0xFF1A2048)
-                            : Colors.grey,
-                      ),
-                    ),
+                  suffixIcon: _eyeIcon(
+                    hovered: _hoverEyeConfirm,
+                    onHover: (v) =>
+                        setState(() => _hoverEyeConfirm = v),
+                    onTap: () => setState(() =>
+                        _showConfirmPassword = !_showConfirmPassword),
+                    visible: _showConfirmPassword,
                   ),
                 ),
 
                 const SizedBox(height: 26),
 
-                // Register button
+                // ================= REGISTER BUTTON =================
                 MouseRegion(
                   onEnter: (_) => setState(() => _hoverRegister = true),
                   onExit: (_) => setState(() => _hoverRegister = false),
@@ -168,15 +143,19 @@ class _RegisterPageState extends State<RegisterPage> {
                           jsonEncode({
                             "username": _usernameController.text,
                             "password1": _passwordController.text,
-                            "password2": _confirmPasswordController.text,
+                            "password2":
+                                _confirmPasswordController.text,
                           }),
                         );
 
-                        if (response['status'] == 'success') {
+                        // 🔑 SESUAI BACKEND ANDA
+                        if (response['status'] == true) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text("Registration successful!")),
+                                content:
+                                    Text("Registration successful!")),
                           );
+
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -185,44 +164,54 @@ class _RegisterPageState extends State<RegisterPage> {
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                                content: Text(
-                                    response['message'] ??
-                                        "Registration failed.")),
+                              content: Text(
+                                response['message'] ??
+                                    "Registration failed.",
+                              ),
+                            ),
                           );
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _hoverRegister ? const Color(0xFF2A3372) : const Color(0xFF1A2048),
+                        backgroundColor: _hoverRegister
+                            ? const Color(0xFF2A3372)
+                            : const Color(0xFF1A2048),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text("Register",
-                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                      child: const Text(
+                        "Register",
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 22),
 
-                // Login text
+                // ================= SIGN IN TEXT =================
                 Center(
                   child: MouseRegion(
-                    onEnter: (_) => setState(() => _hoverLoginText = true),
-                    onExit: (_) => setState(() => _hoverLoginText = false),
+                    cursor: SystemMouseCursors.click,
+                    onEnter: (_) =>
+                        setState(() => _hoverLoginText = true),
+                    onExit: (_) =>
+                        setState(() => _hoverLoginText = false),
                     child: GestureDetector(
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (_) => const LoginPage()),
+                          MaterialPageRoute(
+                              builder: (_) => const LoginPage()),
                         );
                       },
                       child: Text(
                         "Already have an account?  Sign In",
                         style: TextStyle(
                           color: _hoverLoginText
-                              ? const Color(0xFF131A40)
+                              ? const Color(0xFF000B7A)
                               : const Color(0xFF1A2048),
                           fontWeight: FontWeight.bold,
                         ),
@@ -238,7 +227,30 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // FIXED: Hoverable input field with separate hover for eye icon
+  // ================= HELPERS =================
+
+  Widget _eyeIcon({
+    required bool hovered,
+    required Function(bool) onHover,
+    required VoidCallback onTap,
+    required bool visible,
+  }) {
+    return MouseRegion(
+      onEnter: (_) => onHover(true),
+      onExit: (_) => onHover(false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Icon(
+          visible
+              ? Icons.visibility_outlined
+              : Icons.visibility_off_outlined,
+          color: hovered ? const Color(0xFF1A2048) : Colors.grey,
+        ),
+      ),
+    );
+  }
+
   Widget _hoverableInput({
     required bool hover,
     required Function(bool) onHover,
@@ -251,7 +263,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return MouseRegion(
       onEnter: (_) => onHover(true),
       onExit: (_) => onHover(false),
-      cursor: SystemMouseCursors.text,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         height: 48,
@@ -259,22 +270,22 @@ class _RegisterPageState extends State<RegisterPage> {
           color: const Color(0xfff5f6fa),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: hover ? const Color(0xFF1A2048) : const Color(0xffe4e6ed),
-            width: hover ? 1.7 : 1,
+            color:
+                hover ? const Color(0xFF1A2048) : const Color(0xffe4e6ed),
+            width: hover ? 1.4 : 1,
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           children: [
-            Icon(icon, color: hover ? const Color(0xFF1A2048) : Colors.grey),
+            Icon(icon,
+                color: hover ? const Color(0xFF1A2048) : Colors.grey),
             const SizedBox(width: 10),
             Expanded(
               child: TextField(
                 controller: controller,
                 obscureText: obscure,
-                decoration: InputDecoration(
-                  hintText: hint,
-                  hintStyle: const TextStyle(color: Colors.grey),
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                 ),
               ),
