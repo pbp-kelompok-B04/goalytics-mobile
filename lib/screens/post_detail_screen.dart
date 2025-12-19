@@ -9,6 +9,7 @@ import 'package:goalytics_mobile/widgets/post/post_discussion_section.dart';
 import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:goalytics_mobile/widgets/post/post_delete_sheet.dart';
 
 class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({
@@ -415,41 +416,22 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     );
   }
 
-  void _confirmDelete(ForumComment comment) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: const Text(
-            'Delete Comment',
-            style: TextStyle(fontWeight: FontWeight.w800),
-          ),
-          content: const Text(
-            'Are you sure you want to delete this comment? This action cannot be undone.',
-            style: TextStyle(color: Color(0xFF475569)),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEF4444),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: () => _deleteComment(comment),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+void _confirmDelete(ForumComment comment) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) {
+      return GenericDeleteSheet(
+        title: 'Delete Comment', 
+        description: 'Are you sure you want to delete this comment? It will be gone forever.',
+        onConfirm: () {
+          Navigator.of(ctx).pop();
+          _deleteComment(comment); 
+        },
+      );
+    },
+  );
+}
 
   void _showToast(String message, {bool isError = false}) {
     if (!mounted) return;
