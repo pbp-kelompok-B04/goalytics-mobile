@@ -365,7 +365,7 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    "Evaluate Performance",
+                    "Compare two players",
                     style: TextStyle(
                       fontSize: 28, fontWeight: FontWeight.w800, 
                       color: AppColors.slate900, height: 1.2

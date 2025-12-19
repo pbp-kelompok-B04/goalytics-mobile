@@ -18,7 +18,7 @@ class _ExploreProfilesPageState extends State<ExploreProfilesPage> {
   bool _initialized = false; 
   List<ProfileEntry> _results = [];
 
-  static const String baseUrl = "http://localhost:8000"; 
+  static const String baseUrl = "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id"; 
 
   @override
   void dispose() {

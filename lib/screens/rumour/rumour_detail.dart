@@ -89,7 +89,7 @@ class RumourDetailPage extends StatelessWidget {
               if (confirm != true) return;
 
               final url =
-                  'http://localhost:8000/transfer-rumours/${rumour.slug}/delete-flutter/';
+                  'https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id/transfer-rumours/${rumour.slug}/delete-flutter/';
 
               final response = await request.postJson(
                 url,
