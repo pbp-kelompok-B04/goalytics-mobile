@@ -18,63 +18,71 @@ class ForumFilters extends StatelessWidget {
   final String currentSort;
   final ValueChanged<String> onSortChanged;
 
+  // Palet Warna Tailwind Slate
+  static const Color slate50 = Color(0xFFF8FAFC);
+  static const Color slate200 = Color(0xFFE2E8F0);
+  static const Color slate400 = Color(0xFF94A3B8);
+  static const Color slate600 = Color(0xFF475569);
+  static const Color slate900 = Color(0xFF0F172A);
+
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.all(24), // p-6
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(24), // rounded-3xl
+        border: Border.all(color: slate200), // border-slate-200
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0F000000),
-            blurRadius: 16,
-            offset: Offset(0, 8),
+            color: Color(0x08000000), // shadow-sm (lebih halus)
+            blurRadius: 2,
+            offset: Offset(0, 1),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search, size: 18),
-                    hintText: 'Search discussions',
-                    filled: true,
-                    fillColor: const Color(0xFFF8FAFC),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Color(0xFF94A3B8)),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
-                  onChanged: onSearchChanged,
-                ),
+          // --- Search Bar ---
+          // flex flex-col gap-3 ...
+          TextField(
+            controller: searchController,
+            onChanged: onSearchChanged,
+            style: const TextStyle(fontSize: 14, color: slate600),
+            decoration: InputDecoration(
+              hintText: 'Search discussions',
+              hintStyle: const TextStyle(color: slate600),
+              filled: true,
+              fillColor: slate50, // bg-slate-50
+              prefixIcon: const Icon(Icons.search, size: 20, color: slate400),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14, // py-3
               ),
-            ],
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16), // rounded-2xl
+                borderSide: const BorderSide(color: slate200),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: slate400),
+              ),
+            ),
           ),
-          const SizedBox(height: 16),
+
+          const SizedBox(height: 24), // gap-6
+
+          // --- Leagues Section ---
           const _SectionLabel(text: 'Leagues'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 8), // mb-2
           Wrap(
-            spacing: 8,
+            spacing: 8, // gap-2
             runSpacing: 8,
             children: [
-              ForumChip(
+              _ForumChip(
                 label: 'All',
-                active: currentLeague.isEmpty,
+                isActive: currentLeague.isEmpty,
                 onTap: () => onLeagueChanged(''),
               ),
               ...const [
@@ -84,29 +92,32 @@ class ForumFilters extends StatelessWidget {
                 ['BUNDES', 'Bundesliga'],
                 ['LIGUE1', 'Ligue 1'],
               ].map(
-                (e) => ForumChip(
+                (e) => _ForumChip(
                   label: e[1],
-                  active: currentLeague == e[0],
+                  isActive: currentLeague == e[0],
                   onTap: () => onLeagueChanged(e[0]),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+
+          const SizedBox(height: 16), // space-y-4 (jarak antar section)
+
+          // --- Sort Section ---
           const _SectionLabel(text: 'Sort by'),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              ForumChip(
+              _ForumChip(
                 label: 'Newest',
-                active: currentSort == 'newest',
+                isActive: currentSort == 'newest',
                 onTap: () => onSortChanged('newest'),
               ),
-              ForumChip(
+              _ForumChip(
                 label: 'Oldest',
-                active: currentSort == 'oldest',
+                isActive: currentSort == 'oldest',
                 onTap: () => onSortChanged('oldest'),
               ),
             ],
@@ -117,37 +128,58 @@ class ForumFilters extends StatelessWidget {
   }
 }
 
-class ForumChip extends StatelessWidget {
-  const ForumChip({
-    super.key,
+class _ForumChip extends StatelessWidget {
+  const _ForumChip({
     required this.label,
-    required this.active,
+    required this.isActive,
     required this.onTap,
   });
 
   final String label;
-  final bool active;
+  final bool isActive;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        backgroundColor: active ? const Color(0xFF0F172A) : Colors.white,
-        foregroundColor: active ? Colors.white : const Color(0xFF475569),
-        side: BorderSide(
-          color: active ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
+    // Style Mapping:
+    // Active: bg-slate-900 text-white shadow-xl border-slate-900
+    // Inactive: bg-white text-slate-600 border-slate-200
+    
+    const slate200 = Color(0xFFE2E8F0);
+    const slate600 = Color(0xFF475569);
+    const slate900 = Color(0xFF0F172A);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // px-4 py-2
+        decoration: BoxDecoration(
+          color: isActive ? slate900 : Colors.white,
+          borderRadius: BorderRadius.circular(16), // rounded-2xl
+          border: Border.all(
+            color: isActive ? slate900 : slate200,
+            width: 1,
+          ),
+          boxShadow: isActive
+              ? [
+                  const BoxShadow(
+                    color: Color(0x330F172A), // shadow-xl approximation
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  )
+                ]
+              : [],
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14, // text-sm
+            fontWeight: FontWeight.w500, // font-medium
+            color: isActive ? Colors.white : slate600,
+          ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        elevation: active ? 6 : 0,
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -159,13 +191,14 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // text-xs font-medium uppercase tracking-wide text-slate-400
     return Text(
       text.toUpperCase(),
       style: const TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.6,
-        color: Color(0xFF94A3B8),
+        fontSize: 12, // text-xs
+        fontWeight: FontWeight.w600, // font-medium (sedikit lebih tebal agar terbaca)
+        letterSpacing: 0.8, // tracking-wide
+        color: Color(0xFF94A3B8), // text-slate-400
       ),
     );
   }
