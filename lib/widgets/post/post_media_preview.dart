@@ -1,5 +1,37 @@
 import 'package:flutter/material.dart';
 
+String? _extractYouTubeId(String url) {
+  try {
+    final uri = Uri.parse(url);
+    if (uri.host.contains('youtu.be')) {
+      if (uri.pathSegments.isNotEmpty) {
+        return uri.pathSegments.first;
+      }
+    }
+    if (uri.host.contains('youtube.com')) {
+      if (uri.pathSegments.contains('shorts')) {
+        final index = uri.pathSegments.indexOf('shorts');
+        if (index + 1 < uri.pathSegments.length) {
+          return uri.pathSegments[index + 1];
+        }
+      }
+      if (uri.path == '/watch') {
+        return uri.queryParameters['v'];
+      }
+      if (uri.pathSegments.contains('embed')) {
+        final index = uri.pathSegments.indexOf('embed');
+        if (index + 1 < uri.pathSegments.length) {
+          return uri.pathSegments[index + 1];
+        }
+      }
+    }
+  } catch (_) {}
+  final regExp = RegExp(
+      r'(?:youtu\.be\/|youtube\.com\/(?:watch\?[^#]*v=|shorts\/|embed\/))([A-Za-z0-9_-]{6,})');
+  final match = regExp.firstMatch(url);
+  return match?.group(1);
+}
+
 class PostMediaPreview extends StatelessWidget {
   const PostMediaPreview({super.key, required this.url});
 
@@ -7,15 +39,52 @@ class PostMediaPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ytId = _extractYouTubeId(url);
+    if (ytId != null) {
+      final thumb = 'https://img.youtube.com/vi/$ytId/0.jpg';
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: Image.network(
+              thumb,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: 200,
+              errorBuilder: (_, __, ___) => PostMediaFallback(url: url),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              shape: BoxShape.circle,
+            ),
+            padding: const EdgeInsets.all(16),
+            child: const Icon(
+              Icons.play_arrow_rounded,
+              color: Colors.white,
+              size: 40,
+            ),
+          ),
+        ],
+      );
+    }
+
     final lower = url.toLowerCase();
     final looksLikeImage =
-        RegExp(r'\.(png|jpe?g|gif|webp|bmp|avif)$').hasMatch(lower);
+        RegExp(r'\.(png|jpe?g|gif|webp|bmp|avif)$').hasMatch(lower) ||
+            url.contains('images') ||
+            url.contains('img') ||
+            url.contains('media');
+
     if (looksLikeImage) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: Image.network(
           url,
           fit: BoxFit.cover,
+          width: double.infinity,
           errorBuilder: (_, __, ___) => PostMediaFallback(url: url),
         ),
       );

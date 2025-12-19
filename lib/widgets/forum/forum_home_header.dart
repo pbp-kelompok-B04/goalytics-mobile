@@ -125,9 +125,9 @@ class ForumHomeHeader extends StatelessWidget {
                     foregroundColor: Colors.white,
                     elevation: 10,
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   icon: const Icon(Icons.add, size: 18),
