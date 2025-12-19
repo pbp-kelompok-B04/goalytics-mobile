@@ -9,6 +9,7 @@ import 'package:goalytics_mobile/widgets/forum/forum_notification_sheet.dart';
 import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:goalytics_mobile/widgets/post/post_delete_sheet.dart';
 
 class ForumHomeScreen extends StatefulWidget {
   const ForumHomeScreen({
@@ -75,8 +76,9 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
     await service.markNotificationsRead();
     setState(() {
       _notifUnread = false;
-      _notifications =
-          _notifications.map((n) => n.copyWith(isRead: true)).toList();
+      _notifications = _notifications
+          .map((n) => n.copyWith(isRead: true))
+          .toList();
     });
   }
 
@@ -108,9 +110,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-        ),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: const ForumEditorSheet(),
       ),
     );
@@ -133,10 +133,12 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
     if (_query.isEmpty) return _posts;
     final q = _query.toLowerCase();
     return _posts
-        .where((p) =>
-            p.title.toLowerCase().contains(q) ||
-            p.content.toLowerCase().contains(q) ||
-            p.author.toLowerCase().contains(q))
+        .where(
+          (p) =>
+              p.title.toLowerCase().contains(q) ||
+              p.content.toLowerCase().contains(q) ||
+              p.author.toLowerCase().contains(q),
+        )
         .toList();
   }
 
@@ -146,9 +148,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-        ),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: ForumEditorSheet(
           initialTitle: post.title,
           initialContent: post.content,
@@ -173,46 +173,35 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
   }
 
   Future<void> _deletePost(ForumPost post) async {
-    final confirm = await showDialog<bool>(
+    showModalBottomSheet(
       context: context,
+      backgroundColor:
+          Colors.transparent, 
       builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: const Text(
-            'Delete Post',
-            style: TextStyle(fontWeight: FontWeight.w800),
-          ),
-          content: const Text(
-            'Are you sure you want to delete this post? This action cannot be undone.',
-            style: TextStyle(color: Color(0xFF475569)),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEF4444),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('Delete'),
-            ),
-          ],
+        return GenericDeleteSheet(
+          title: 'Delete Post',
+          description:
+              'Are you sure you want to delete this post? This action cannot be undone.',
+          confirmLabel: 'Delete', 
+          onConfirm: () async {
+            Navigator.of(ctx).pop();
+            try {
+              final req = context.read<CookieRequest>();
+              final service = ForumService(req, baseUrl: kApiBaseUrl);
+
+              await service.deletePost(post.id);
+
+              if (!mounted) return;
+              _showToast('Post deleted.');
+              _load(); 
+            } catch (e) {
+              if (!mounted) return;
+              _showToast('Failed to delete post.', isError: true);
+            }
+          },
         );
       },
     );
-    if (confirm != true) return;
-    final req = context.read<CookieRequest>();
-    final service = ForumService(req, baseUrl: kApiBaseUrl);
-    await service.deletePost(post.id);
-    if (!mounted) return;
-    _showToast('Post deleted.');
-    _load();
   }
 
   void _showToast(String message, {bool isError = false}) {
@@ -220,8 +209,9 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor:
-            isError ? const Color(0xFFEF4444) : const Color(0xFF0F172A),
+        backgroundColor: isError
+            ? const Color(0xFFEF4444)
+            : const Color(0xFF0F172A),
       ),
     );
   }
@@ -256,9 +246,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
           onNotifications: _openNotifications,
           onPostTap: (p) {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => PostDetailScreen(postId: p.id),
-              ),
+              MaterialPageRoute(builder: (_) => PostDetailScreen(postId: p.id)),
             );
           },
           onPostLike: (p) async {
@@ -269,10 +257,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
               _posts = _posts
                   .map(
                     (e) => e.id == p.id
-                        ? e.copyWith(
-                            isLiked: !e.isLiked,
-                            likeCount: likeCount,
-                          )
+                        ? e.copyWith(isLiked: !e.isLiked, likeCount: likeCount)
                         : e,
                   )
                   .toList();
@@ -305,10 +290,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
 }
 
 extension on ForumPost {
-  ForumPost copyWith({
-    bool? isLiked,
-    int? likeCount,
-  }) {
+  ForumPost copyWith({bool? isLiked, int? likeCount}) {
     return ForumPost(
       id: id,
       author: author,
