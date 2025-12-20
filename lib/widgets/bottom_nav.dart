@@ -5,6 +5,7 @@ import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
 import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
+import 'package:goalytics_mobile/screens/discussion/post_detail_screen.dart';
 
 class BottomNav extends StatelessWidget {
   const BottomNav({super.key});
@@ -19,6 +20,7 @@ class BottomNav extends StatelessWidget {
     if (context.findAncestorWidgetOfExactType<MyProfilePage>() != null) return 1;
     if (context.findAncestorWidgetOfExactType<MatchPredictionPage>() != null) return 2;
     if (context.findAncestorWidgetOfExactType<ForumHomeScreen>() != null) return 3;
+    if (context.findAncestorWidgetOfExactType<PostDetailScreen>() != null) return 3;
     if (context.findAncestorWidgetOfExactType<ComparisonScreen>() != null) return 4;
     if (context.findAncestorWidgetOfExactType<RumourListPage>() != null) return 5;
 
@@ -52,7 +54,7 @@ class BottomNav extends StatelessWidget {
         nextScreen = const MyHomePage(title: "Dashboard");
     }
 
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) => nextScreen,
