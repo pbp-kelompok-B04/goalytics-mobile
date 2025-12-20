@@ -4,9 +4,9 @@ import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
+import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
+// 👇 PERBAIKAN IMPORT: Mengarah ke nama file yang benar di repo Anda
 import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
-
-const Color primaryDark = Color(0xFF0F172A);
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -14,20 +14,22 @@ class LeftDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: primaryDark,
+      backgroundColor: const Color(0xff1c2341),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           // ===================== HEADER =====================
           DrawerHeader(
-            decoration: const BoxDecoration(color: primaryDark),
+            decoration: const BoxDecoration(
+              color: Color(0xff1c2341),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 CircleAvatar(
                   radius: 26,
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.sports_soccer, color: primaryDark),
+                  child: Icon(Icons.sports_soccer, color: Colors.black),
                 ),
                 SizedBox(height: 12),
                 Text(
@@ -56,7 +58,7 @@ class LeftDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const MyHomePage(title: "Dashboard"),
+                  const MyHomePage(title: "Dashboard"),
                 ),
               );
             },
@@ -97,7 +99,15 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.psychology,
             title: "Match Prediction",
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // 👇 HAPUS const DI SINI
+                  builder: (context) => MatchPredictionPage(),
+                ),
+              );
+            },
           ),
 
           _drawerItem(
@@ -107,8 +117,8 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) =>
-                      const ForumHomeScreen(withSidebar: true),
+                  // 👇 HAPUS const DI SINI & PASTIKAN NAMA CLASS BENAR
+                  builder: (_) => ForumHomeScreen(withSidebar: true),
                 ),
               );
             },
