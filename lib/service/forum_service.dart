@@ -1,0 +1,167 @@
+import 'dart:convert';
+
+import 'package:goalytics_mobile/models/forum_models.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+
+class ForumService {
+  ForumService(this.request, {required this.baseUrl});
+
+  final CookieRequest request;
+  final String baseUrl;
+
+  Future<List<ForumPost>> fetchPosts({
+    String? league,
+    String sort = 'newest',
+    bool mine = false,
+  }) async {
+    final params = <String, String>{'sort': sort};
+    if (league?.isNotEmpty == true) params['league'] = league!;
+    if (mine) params['mine'] = 'true';
+    final uri =
+        Uri.parse('$baseUrl/forum/api/posts/').replace(queryParameters: params);
+    final resp = await request.get(uri.toString());
+    final list = (resp['data'] as List<dynamic>? ?? []);
+    return list.map((e) => ForumPost.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  Future<ForumPost> getPost(int id) async {
+    final resp = await request.get('$baseUrl/forum/api/posts/$id/');
+    return ForumPost.fromJson(resp['data']);
+  }
+
+  Future<List<ForumComment>> getComments(int postId) async {
+    final resp = await request.get('$baseUrl/forum/api/posts/$postId/comments/');
+    final list = (resp['data'] as List<dynamic>? ?? []);
+    return list.map((e) => ForumComment.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  Future<ForumPost> createPost({
+    required String title,
+    required String content,
+    String league = 'EPL',
+    String? mediaUrl,
+    String? attachmentUrl,
+  }) async {
+    final resp = await request.postJson(
+      '$baseUrl/forum/api/posts/create/',
+      jsonEncode({
+        'title': title,
+        'content': content,
+        'league': league,
+        if (mediaUrl != null) 'media_url': mediaUrl,
+        if (attachmentUrl != null) 'attachment_url': attachmentUrl,
+      }),
+    );
+    return ForumPost.fromJson(resp['data']);
+  }
+
+  Future<void> updatePost({
+    required int postId,
+    String? title,
+    String? content,
+    String? league,
+    String? attachmentUrl,
+  }) async {
+    await request.postJson(
+      '$baseUrl/forum/api/posts/$postId/update/',
+      jsonEncode({
+        '_method': 'PATCH',
+        'post_id': postId,
+        if (title != null) 'title': title,
+        if (content != null) 'content': content,
+        if (league != null) 'league': league,
+        if (attachmentUrl != null) 'attachment_url': attachmentUrl,
+      }),
+    );
+  }
+
+  Future<void> deletePost(int postId) async {
+    await request.postJson(
+      '$baseUrl/forum/api/posts/$postId/delete/',
+      jsonEncode({
+        '_method': 'DELETE',
+        'post_id': postId,
+      }),
+    );
+  }
+
+  Future<ForumComment> createComment({
+    required int postId,
+    required String content,
+    int? parentId,
+  }) async {
+    final resp = await request.postJson(
+      '$baseUrl/forum/api/posts/$postId/comments/create/',
+      jsonEncode({
+        'content': content,
+        if (parentId != null) 'parent_id': parentId,
+      }),
+    );
+    return ForumComment.fromJson(resp['data']);
+  }
+
+  Future<void> updateComment({
+    required int postId,
+    required int commentId,
+    required String content,
+  }) async {
+    await request.postJson(
+      '$baseUrl/forum/api/comments/$commentId/update/',
+      jsonEncode({
+        '_method': 'PATCH',
+        'post_id': postId,
+        'comment_id': commentId,
+        'content': content,
+      }),
+    );
+  }
+
+  Future<void> deleteComment({
+    required int postId,
+    required int commentId,
+  }) async {
+    await request.postJson(
+      '$baseUrl/forum/api/comments/$commentId/delete/',
+      jsonEncode({
+        '_method': 'DELETE',
+        'post_id': postId,
+        'comment_id': commentId,
+      }),
+    );
+  }
+
+  Future<int> togglePostLike(int postId) async {
+    final resp = await request.postJson(
+      '$baseUrl/forum/api/posts/$postId/likes/',
+      jsonEncode({'_method': 'PATCH', 'post_id': postId}),
+    );
+    return resp['like_count'] ?? 0;
+  }
+
+  Future<int> toggleCommentLike({
+    required int postId,
+    required int commentId,
+  }) async {
+    final resp = await request.postJson(
+      '$baseUrl/forum/api/comments/$commentId/likes/',
+      jsonEncode({
+        '_method': 'PATCH',
+        'post_id': postId,
+        'comment_id': commentId,
+      }),
+    );
+    return resp['like_count'] ?? 0;
+  }
+
+  Future<List<ForumNotification>> getNotifications() async {
+    final resp = await request.get('$baseUrl/forum/api/notifications/');
+    final list = (resp['data'] as List<dynamic>? ?? []);
+    return list
+        .map((e) => ForumNotification.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> markNotificationsRead() async {
+    await request.post('$baseUrl/forum/api/notifications/mark_read/', {});
+  }
+}

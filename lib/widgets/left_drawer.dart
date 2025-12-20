@@ -4,7 +4,6 @@ import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
-import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -41,10 +40,7 @@ class LeftDrawer extends StatelessWidget {
                 SizedBox(height: 4),
                 Text(
                   "Your football companion",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white70),
                 ),
               ],
             ),
@@ -85,7 +81,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const RumourListPage(),
+                  builder: (_) => const RumourListPage(),
                 ),
               );
             },
@@ -94,14 +90,13 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.favorite,
             title: "Favorite Players",
-            onTap: () {
-              // TODO: Routing nanti
-            },
+            onTap: () {},
           ),
 
           _drawerItem(
             icon: Icons.psychology,
             title: "Match Prediction",
+            onTap: () {},
             onTap: () {
               Navigator.push(
                 context,
@@ -116,7 +111,13 @@ class LeftDrawer extends StatelessWidget {
             icon: Icons.forum,
             title: "Discussion Forum",
             onTap: () {
-              // TODO: Routing nanti
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const ForumHomeScreen(withSidebar: true),
+                ),
+              );
             },
           ),
 
@@ -127,7 +128,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ComparisonScreen(),
+                  builder: (_) => const ComparisonScreen(),
                 ),
               );
             },
@@ -151,16 +152,14 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.settings_outlined,
             title: "Settings",
-            onTap: () {
-              // TODO: Routing nanti
-            },
+            onTap: () {},
           ),
 
           _drawerItem(
             icon: Icons.logout,
             title: "Logout",
             onTap: () {
-              // TODO: Nanti diisi logic logout (hapus session, balik ke LoginPage)
+              // TODO: logout logic
             },
           ),
         ],
