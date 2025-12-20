@@ -5,9 +5,7 @@ import '../models/comparison_model.dart';
 import 'api_config.dart';
 
 class PlayerService {
-  // =========================
-  // SEARCH PLAYER (public endpoint)
-  // =========================
+
   static Future<List<Player>> searchPlayers(String query) async {
     final url = Uri.parse(
       "${ApiConfig.baseUrl}/comparison/api/player-search/?q=$query",
@@ -27,9 +25,7 @@ class PlayerService {
     );
   }
 
-  // =========================
-  // COMPARE PLAYER (public endpoint)
-  // =========================
+
 static Future<Map<String, dynamic>> comparePlayers({
   required int player1Id,
   required int player2Id,
@@ -47,17 +43,14 @@ static Future<Map<String, dynamic>> comparePlayers({
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       
-      // Validasi response structure
       if (decoded is! Map<String, dynamic>) {
         throw Exception("Invalid response format");
       }
-      
-      // Cek jika server mengembalikan error
+ 
       if (decoded.containsKey('error')) {
         throw Exception(decoded['error']);
       }
       
-      // Cek jika success = false
       if (decoded.containsKey('success') && decoded['success'] == false) {
         throw Exception(decoded['error'] ?? 'Comparison failed');
       }
@@ -77,9 +70,7 @@ static Future<Map<String, dynamic>> comparePlayers({
   }
 }
 
-  // =========================
-  // GET PLAYER BY ID (private endpoint - butuh auth)
-  // =========================
+
   static Future<Player> getPlayerById(
     int playerId, 
     CookieRequest request,
