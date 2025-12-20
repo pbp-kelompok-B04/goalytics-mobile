@@ -1,9 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/ProfileEntry.dart';
 import 'profile_detail_page.dart';
+
+String proxiedImageUrl(String originalUrl) {
+  final raw = originalUrl.trim();
+  if (raw.isEmpty) return "";
+
+  if (raw.contains("/users/image-proxy/")) return raw;
+
+  final base = ApiConfig.baseUrl.endsWith('/')
+      ? ApiConfig.baseUrl.substring(0, ApiConfig.baseUrl.length - 1)
+      : ApiConfig.baseUrl;
+
+  final uri = Uri.tryParse(raw);
+  if (uri == null) return "";
+
+  final absolute =
+      uri.hasScheme ? raw : (raw.startsWith('/') ? "$base$raw" : "$base/$raw");
+
+  if (absolute.startsWith(base)) return absolute;
+
+  return "$base/users/image-proxy/?url=${Uri.encodeComponent(absolute)}";
+}
+
+Widget profileAvatar({
+  required String imageUrl,
+  required String fallbackText,
+  double radius = 20,
+}) {
+  final url = proxiedImageUrl(imageUrl);
+  if (url.isEmpty) {
+    return CircleAvatar(
+      radius: radius,
+      child: Text(
+        fallbackText.isNotEmpty ? fallbackText[0].toUpperCase() : "?",
+      ),
+    );
+  }
+
+  final size = radius * 2;
+  return CircleAvatar(
+    radius: radius,
+    child: ClipOval(
+      child: Image.network(
+        url,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Text(
+              fallbackText.isNotEmpty ? fallbackText[0].toUpperCase() : "?",
+            ),
+          );
+        },
+      ),
+    ),
+  );
+}
 
 class ExploreProfilesPage extends StatefulWidget {
   const ExploreProfilesPage({super.key});
@@ -15,10 +73,8 @@ class ExploreProfilesPage extends StatefulWidget {
 class _ExploreProfilesPageState extends State<ExploreProfilesPage> {
   final TextEditingController _searchController = TextEditingController();
   bool _loading = false;
-  bool _initialized = false; 
+  bool _initialized = false;
   List<ProfileEntry> _results = [];
-
-  static const String baseUrl = "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id"; 
 
   @override
   void dispose() {
@@ -30,7 +86,8 @@ class _ExploreProfilesPageState extends State<ExploreProfilesPage> {
     setState(() => _loading = true);
 
     try {
-      final response = await request.get("$baseUrl/users/api/users/?limit=50");
+      final response =
+          await request.get("${ApiConfig.baseUrl}/users/api/users/?limit=50");
 
       if (!mounted) return;
 
@@ -72,7 +129,7 @@ class _ExploreProfilesPageState extends State<ExploreProfilesPage> {
 
     try {
       final url =
-          "$baseUrl/users/search.json?q=${Uri.encodeComponent(query)}";
+          "${ApiConfig.baseUrl}/users/search.json?q=${Uri.encodeComponent(query)}";
       final response = await request.get(url);
 
       if (!mounted) return;
@@ -89,8 +146,7 @@ class _ExploreProfilesPageState extends State<ExploreProfilesPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              (response is Map ? response['message'] : null) ??
-                  "Search failed.",
+              (response is Map ? response['message'] : null) ?? "Search failed.",
             ),
           ),
         );
@@ -148,17 +204,10 @@ class _ExploreProfilesPageState extends State<ExploreProfilesPage> {
                       final p = _results[index];
 
                       return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: p.profilePicture.isNotEmpty
-                              ? NetworkImage(p.profilePicture)
-                              : null,
-                          child: p.profilePicture.isEmpty
-                              ? Text(
-                                  p.username.isNotEmpty
-                                      ? p.username[0].toUpperCase()
-                                      : "?",
-                                )
-                              : null,
+                        leading: profileAvatar(
+                          imageUrl: p.profilePicture,
+                          fallbackText: p.username,
+                          radius: 20,
                         ),
                         title: Text(p.username),
                         subtitle: Text(
@@ -170,10 +219,11 @@ class _ExploreProfilesPageState extends State<ExploreProfilesPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ProfileDetailPage(username: p.username),
+                              builder: (context) =>
+                                  ProfileDetailPage(username: p.username),
                             ),
                           );
-                        }
+                        },
                       );
                     },
                   ),
