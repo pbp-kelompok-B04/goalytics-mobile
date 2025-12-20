@@ -463,7 +463,10 @@ void _confirmDelete(ForumComment comment) {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF475569)),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
         body: page,
       );
