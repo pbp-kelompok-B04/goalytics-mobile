@@ -4,6 +4,7 @@ import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
+import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -102,7 +103,12 @@ class LeftDrawer extends StatelessWidget {
             icon: Icons.psychology,
             title: "Match Prediction",
             onTap: () {
-              // TODO: Routing nanti
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MatchPredictionPage(),
+                ),
+              );
             },
           ),
 
