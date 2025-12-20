@@ -11,7 +11,6 @@ String proxiedImageUrl(String originalUrl) {
   final raw = originalUrl.trim();
   if (raw.isEmpty) return "";
 
-  // Avoid double-proxy.
   if (raw.contains("/users/image-proxy/")) return raw;
 
   final base = ApiConfig.baseUrl.endsWith('/')
@@ -21,11 +20,9 @@ String proxiedImageUrl(String originalUrl) {
   final uri = Uri.tryParse(raw);
   if (uri == null) return "";
 
-  // If backend returns a relative path, turn it into an absolute URL.
   final absolute =
       uri.hasScheme ? raw : (raw.startsWith('/') ? "$base$raw" : "$base/$raw");
 
-  // If already served from our backend domain, no need to proxy.
   if (absolute.startsWith(base)) return absolute;
 
   return "$base/users/image-proxy/?url=${Uri.encodeComponent(absolute)}";
