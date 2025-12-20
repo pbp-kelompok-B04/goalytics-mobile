@@ -1,15 +1,22 @@
+# This is a basic workflow to help you get started with Actions
 name: Release
 
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push events but only for the main branch
   push:
     branches: [main]
 
+# Permissions needed for creating releases
 permissions:
   contents: write
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  # This workflow contains a single job called "Build and Release APK"
   releases:
     name: Build and Release APK
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
@@ -17,7 +24,7 @@ jobs:
 
       - name: Get version from pubspec.yaml
         id: version
-        run: echo "::set-output name=version::$(grep '^version:' pubspec.yaml | sed 's/version: //')"
+        run: echo "::set-output name=version::$(grep "version:" pubspec.yaml | cut -c10-)"
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -33,11 +40,6 @@ jobs:
       - name: Get packages
         run: flutter pub get
 
-      - name: Disable Gradle VFS watching
-        run: |
-          echo "org.gradle.vfs.watch=false" >> android/gradle.properties
-          echo "org.gradle.daemon=false" >> android/gradle.properties
-
       - name: Build APK
         run: flutter build apk --split-per-abi
 
@@ -48,7 +50,6 @@ jobs:
         run: |
           for apk in build/app/outputs/flutter-apk/*.apk; do
             echo "Signing $apk..."
-            # Pastikan KEY_PASSWORD sudah ada di Secrets GitHub
             jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
               -keystore release-keystore.jks \
               -storepass "${{ secrets.KEY_PASSWORD }}" \
