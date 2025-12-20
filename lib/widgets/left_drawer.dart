@@ -4,6 +4,9 @@ import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
+import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
+// 👇 PERBAIKAN IMPORT: Mengarah ke nama file yang benar di repo Anda
+import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -55,7 +58,7 @@ class LeftDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const MyHomePage(title: "Dashboard"),
+                  const MyHomePage(title: "Dashboard"),
                 ),
               );
             },
@@ -96,12 +99,12 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.psychology,
             title: "Match Prediction",
-            onTap: () {},
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const MatchPredictionPage(),
+                  // 👇 HAPUS const DI SINI
+                  builder: (context) => MatchPredictionPage(),
                 ),
               );
             },
@@ -114,8 +117,8 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) =>
-                      const ForumHomeScreen(withSidebar: true),
+                  // 👇 HAPUS const DI SINI & PASTIKAN NAMA CLASS BENAR
+                  builder: (_) => ForumHomeScreen(withSidebar: true),
                 ),
               );
             },
