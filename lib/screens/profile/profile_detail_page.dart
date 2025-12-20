@@ -1,6 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import '../../service/api_config.dart';
+
+String proxiedImageUrl(String originalUrl) {
+  final raw = originalUrl.trim();
+  if (raw.isEmpty) return "";
+
+  if (raw.contains("/users/image-proxy/")) return raw;
+
+  final base = ApiConfig.baseUrl.endsWith('/')
+      ? ApiConfig.baseUrl.substring(0, ApiConfig.baseUrl.length - 1)
+      : ApiConfig.baseUrl;
+
+  final uri = Uri.tryParse(raw);
+  if (uri == null) return "";
+
+  final absolute =
+      uri.hasScheme ? raw : (raw.startsWith('/') ? "$base$raw" : "$base/$raw");
+
+  if (absolute.startsWith(base)) return absolute;
+
+  return "$base/users/image-proxy/?url=${Uri.encodeComponent(absolute)}";
+}
+
+Widget profileAvatar({
+  required String imageUrl,
+  required String fallbackText,
+  double radius = 50,
+}) {
+  final url = proxiedImageUrl(imageUrl);
+  if (url.isEmpty) {
+    return CircleAvatar(
+      radius: radius,
+      child: Text(
+        fallbackText.isNotEmpty ? fallbackText[0].toUpperCase() : "?",
+        style: TextStyle(fontSize: radius * 0.8),
+      ),
+    );
+  }
+
+  final size = radius * 2;
+  return CircleAvatar(
+    radius: radius,
+    child: ClipOval(
+      child: Image.network(
+        url,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Text(
+              fallbackText.isNotEmpty ? fallbackText[0].toUpperCase() : "?",
+              style: TextStyle(fontSize: radius * 0.8),
+            ),
+          );
+        },
+      ),
+    ),
+  );
+}
 
 class ProfileDetailPage extends StatefulWidget {
   final String username;
@@ -15,8 +75,6 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
   bool _loading = true;
   Map<String, dynamic>? data;
 
-  static const String baseUrl = "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id"; 
-
   @override
   void initState() {
     super.initState();
@@ -28,7 +86,7 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
 
     try {
       final response = await request.get(
-        "$baseUrl/users/api/profile/${widget.username}/",
+        "${ApiConfig.baseUrl}/users/api/profile/${widget.username}/",
       );
 
       if (!mounted) return;
@@ -41,7 +99,7 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
       } else {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to load profile")),
+          const SnackBar(content: Text("Failed to load profile")),
         );
       }
     } catch (e) {
@@ -68,23 +126,12 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      CircleAvatar(
+                      profileAvatar(
+                        imageUrl: (data!["avatar"] ?? "").toString(),
+                        fallbackText: widget.username,
                         radius: 50,
-                        backgroundImage: (data!["avatar"] != null &&
-                                data!["avatar"].toString().isNotEmpty)
-                            ? NetworkImage(data!["avatar"])
-                            : null,
-                        child: (data!["avatar"] == null ||
-                                data!["avatar"].toString().isEmpty)
-                            ? Text(
-                                widget.username[0].toUpperCase(),
-                                style: const TextStyle(fontSize: 40),
-                              )
-                            : null,
                       ),
-
                       const SizedBox(height: 20),
-
                       Text(
                         data!["bio"]?.toString().isNotEmpty == true
                             ? data!["bio"]
@@ -94,15 +141,11 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
                           fontSize: 16,
                         ),
                       ),
-
                       const SizedBox(height: 30),
                       const Divider(),
-
                       _infoTile("Favorite Team", data!["favorite_team"]),
                       _infoTile("Favorite League", data!["favorite_league"]),
-                      _infoTile("Preferred Position",
-                          data!["preferred_position"]),
-
+                      _infoTile("Preferred Position", data!["preferred_position"]),
                       const SizedBox(height: 20),
                     ],
                   ),
