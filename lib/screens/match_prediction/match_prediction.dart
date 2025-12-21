@@ -18,7 +18,6 @@ class MatchPredictionPage extends StatefulWidget {
 class _MatchPredictionPageState extends State<MatchPredictionPage> {
   bool _isManager = false;
 
-  // Warna tema diambil dari LeftDrawer agar konsisten
   final Color _themeColor = const Color(0xff1c2341);
 
   @override
@@ -62,9 +61,13 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
       backgroundColor:
           Colors.grey[50], // Background agak abu terang biar card putih pop-up
       // 1. AppBar Transparan & Icon Hitam (Theme Color)
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+      ),
       bottomNavigationBar: const BottomNav(),
-      // 3. FAB Custom (Extended & Theme Color)
-      // Logika Role Based: Hanya muncul jika _isManager == true
+
       floatingActionButton: _isManager
           ? FloatingActionButton.extended(
               onPressed: () async {
@@ -94,30 +97,58 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Header Section (Typography Modern)
                 const SizedBox(height: 10),
-                Text(
-                  "Football Match\nPrediction",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    color: _themeColor,
-                    height: 1.1, // Line height agak rapat
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  "Predict the score, beat the odds, and rule the leaderboard! Show them you're a true fan.",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    height: 1.5,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Football Match\nPrediction",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: _themeColor,
+                              height: 1.1,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Predict the score, beat the odds, and rule the leaderboard!",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: _themeColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Icon(
+                          Icons.insights,
+                          size: 40,
+                          color: _themeColor,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 30),
 
-                // 2. Section Title "Upcoming Games"
                 Row(
                   children: [
                     Icon(Icons.calendar_month_outlined,
@@ -135,7 +166,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // List Matches
                 FutureBuilder(
                   future: fetchMatches(request),
                   builder: (context, AsyncSnapshot snapshot) {
@@ -164,7 +194,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                         ),
                       );
                     } else {
-                      // ListView di dalam Column harus pake shrinkWrap & physics ini
                       return ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -178,7 +207,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                   },
                 ),
 
-                // Extra space di bawah agar tidak ketutupan FAB
                 const SizedBox(height: 80),
               ],
             ),
@@ -188,9 +216,7 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
     );
   }
 
-  // 4, 5, 6. Custom Card Widget untuk Match
   Widget _buildMatchCard(BuildContext context, Match match) {
-    // Format tanggal sederhana: YYYY-MM-DD HH:MM
     String rawDate = match.fields.matchDatetime.toString();
     String date = rawDate.length > 16
         ? rawDate.substring(0, 16).replaceAll('T', ' • ')
@@ -232,7 +258,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
-                // Header Card: Date & Venue (Small, Grey)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -269,14 +294,12 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
 
                 const SizedBox(height: 20),
 
-                // Main Content: Team A vs Team B
                 Row(
                   children: [
-                    // Home Team (Expanded agar nama panjang turun ke bawah)
                     Expanded(
                       child: Column(
                         children: [
-                          _buildTeamAvatar(homeTeam), // Inisial Klub
+                          _buildTeamAvatar(homeTeam),
                           const SizedBox(height: 8),
                           Text(
                             homeTeam,
@@ -291,7 +314,7 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                       ),
                     ),
 
-                    // VS Badge
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Container(
@@ -313,11 +336,10 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                       ),
                     ),
 
-                    // Away Team
                     Expanded(
                       child: Column(
                         children: [
-                          _buildTeamAvatar(awayTeam), // Inisial Klub
+                          _buildTeamAvatar(awayTeam),
                           const SizedBox(height: 8),
                           Text(
                             awayTeam,
@@ -343,7 +365,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
     );
   }
 
-  // Widget kecil untuk membuat Avatar inisial (misal: "Arsenal" -> "A")
   Widget _buildTeamAvatar(String teamName) {
     return Container(
       width: 50,

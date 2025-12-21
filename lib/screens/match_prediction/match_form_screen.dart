@@ -6,7 +6,7 @@ import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/models/match_model.dart';
 
 class MatchFormScreen extends StatefulWidget {
-  final Match? match; // Jika null = Create, Jika ada = Edit
+  final Match? match;
 
   const MatchFormScreen({super.key, this.match});
 
@@ -17,16 +17,13 @@ class MatchFormScreen extends StatefulWidget {
 class _MatchFormScreenState extends State<MatchFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Theme Color (Midnight Blue)
   final Color _themeColor = const Color(0xff1c2341);
 
-  // Variabel Form
   String? _selectedHomeClub;
   String? _selectedAwayClub;
   DateTime _selectedDate = DateTime.now();
   final TextEditingController _venueController = TextEditingController();
 
-  // Data Klub dari Backend
   List<dynamic> _clubs = [];
   bool _isLoading = true;
 
@@ -73,9 +70,9 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: _themeColor, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: _themeColor, // Body text color
+              primary: _themeColor,
+              onPrimary: Colors.white,
+              onSurface: _themeColor,
             ),
           ),
           child: child!,
@@ -95,7 +92,7 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
     final isEdit = widget.match != null;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50], // Background terang
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -125,7 +122,6 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
               ),
               const SizedBox(height: 30),
 
-              // --- HOME CLUB ---
               _buildLabel("Home Club"),
               _buildDropdownField(
                 hint: "Select Home Club",
@@ -135,7 +131,6 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
               ),
               const SizedBox(height: 20),
 
-              // --- AWAY CLUB ---
               _buildLabel("Away Club"),
               _buildDropdownField(
                 hint: "Select Away Club",
@@ -149,7 +144,6 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
               ),
               const SizedBox(height: 20),
 
-              // --- DATE PICKER ---
               _buildLabel("Match Date"),
               GestureDetector(
                 onTap: () => _selectDate(context),
@@ -223,7 +217,6 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Tentukan URL: Create atau Edit
                       String url = isEdit
                           ? "${ApiConfig.baseUrl}/matchprediction/edit-match-flutter/${widget.match!.pk}/"
                           : "${ApiConfig.baseUrl}/matchprediction/create-match-flutter/";
@@ -244,7 +237,7 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
                             content: Text("Match saved successfully!"),
                             behavior: SnackBarBehavior.floating,
                           ));
-                          Navigator.pop(context, true); // Balik dan refresh
+                          Navigator.pop(context, true);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text(response['message'] ?? "Error"),
@@ -272,7 +265,6 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
     );
   }
 
-  // Helper Widget: Label Teks
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
@@ -287,7 +279,6 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
     );
   }
 
-  // Helper Widget: Custom Dropdown
   Widget _buildDropdownField({
     required String hint,
     required String? value,
