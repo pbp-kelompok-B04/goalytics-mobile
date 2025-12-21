@@ -96,6 +96,8 @@ class _YouTubeVideoPlayerState extends State<YouTubeVideoPlayer> {
         mute: false,
         showFullscreenButton: true,
         loop: false,
+        enableJavaScript: true,
+        playsInline: true,
       ),
     );
     setState(() => _isPlaying = true);
