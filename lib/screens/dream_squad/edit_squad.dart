@@ -183,6 +183,14 @@ class _SquadFormPageState extends State<SquadFormPage> {
     });
   }
 
+  // NEW: reliable helper to remove selected player by id (no fake DiscoveryPlayer)
+  void _removeSelectedById(int id) {
+    setState(() {
+      _selectedPlayers.removeWhere((sp) => sp['id'] == id);
+      debugPrint('Removed player id=$id, remaining=${_selectedPlayers.length}');
+    });
+  }
+
   Future<void> _saveSquad() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -262,7 +270,8 @@ class _SquadFormPageState extends State<SquadFormPage> {
                     children: [
                       _buildFormCard(),
                       const SizedBox(height: 20),
-                      _buildRosterCard(),
+                      // make roster flexible inside left column
+                      Expanded(child: _buildRosterCard()),
                     ],
                   ),
                 ),
@@ -287,16 +296,17 @@ class _SquadFormPageState extends State<SquadFormPage> {
               ],
             );
           } else {
-            // mobile / narrow layout: single column (falls back to original appearance)
+            // mobile / narrow layout: single column (improved responsiveness)
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFormCard(),
-                  const SizedBox(height: 20),
-                  _buildRosterCard(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
+                  // Roster card - not Expanded on mobile; fixed height so interactions work
+                  SizedBox(height: 260, child: _buildRosterCard()),
+                  const SizedBox(height: 16),
                   const Text("Discover Players", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   TextField(
@@ -382,71 +392,78 @@ class _SquadFormPageState extends State<SquadFormPage> {
     );
   }
 
+  // Roster card now returns a normal Widget so it can be used both inside Expanded (desktop)
+  // and inside SizedBox (mobile). This avoids Expanded-in-unbounded-height issues on mobile.
   Widget _buildRosterCard() {
-    return Expanded(
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // header with badge
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Current Player", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // header with badge
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Current Player", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.slate100,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text("${_selectedPlayers.length} Players", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                )
+              ],
+            ),
+            const SizedBox(height: 12),
+            // flexible list area
+            Expanded(
+              child: _selectedPlayers.isEmpty
+                  ? const Center(child: Text("No players added yet.", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)))
+                  : ListView.separated(
+                itemCount: _selectedPlayers.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  final p = _selectedPlayers[index];
+                  return Container(
                     decoration: BoxDecoration(
-                      color: AppColors.slate100,
-                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.slate100),
                     ),
-                    child: Text("${_selectedPlayers.length} Players", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                  )
-                ],
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: _selectedPlayers.isEmpty
-                    ? const Center(child: Text("No players added yet.", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)))
-                    : ListView.separated(
-                  itemCount: _selectedPlayers.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final p = _selectedPlayers[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.slate100),
-                      ),
-                      child: ListTile(
-                        title: Text(p['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(p['position'] ?? '', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                        trailing: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedPlayers.removeAt(index);
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.rose50,
-                            ),
-                            padding: const EdgeInsets.all(6),
-                            child: Icon(Icons.close, color: AppColors.rose500, size: 18),
+                    child: ListTile(
+                      title: Text(p['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(p['position'] ?? '', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      // REPLACED: use IconButton + helper that removes by id (no fake DiscoveryPlayer)
+                      trailing: IconButton(
+                        onPressed: () {
+                          final idVal = p['id'];
+                          // ensure id is int
+                          final idInt = idVal is int ? idVal : int.tryParse(idVal.toString());
+                          if (idInt != null) {
+                            _removeSelectedById(idInt);
+                          } else {
+                            debugPrint('Invalid id for removal: $idVal');
+                          }
+                        },
+                        icon: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.rose50,
                           ),
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(Icons.close, color: AppColors.rose500, size: 18),
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -494,77 +511,101 @@ class _SquadFormPageState extends State<SquadFormPage> {
     }
 
     if (_searchResults.isEmpty) {
-      return const Center(child: Text("No players found. Try searching."),);
+      return const Center(child: Text("No players found. Try searching."));
     }
 
-    // Use Grid with 2 columns to imitate the provided screenshot
+    // Responsive columns based on current width
+    final width = MediaQuery.of(context).size.width;
+    int crossAxisCount;
+    if (width > 1200) {
+      crossAxisCount = 4;
+    } else if (width > 900) {
+      crossAxisCount = 3;
+    } else if (width > 600) {
+      crossAxisCount = 2;
+    } else {
+      crossAxisCount = 1;
+    }
+
     return GridView.builder(
       padding: const EdgeInsets.only(top: 6),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 3.6, // wide cards
+        childAspectRatio: (crossAxisCount == 1) ? 4.5 : 3.6,
       ),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         final p = _searchResults[index];
         final isSelected = _isSelectedById(p.id);
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          child: InkWell(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.slate100),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 6, offset: const Offset(0, 2)),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Row(
-            children: [
-              // optional avatar placeholder (initials)
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: AppColors.indigo50,
-                child: Text(
-                  (p.name.isNotEmpty ? p.name.split(' ').map((s) => s.isNotEmpty ? s[0] : '').take(2).join() : '?'),
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo),
-                ),
+            onTap: () {
+              // make tapping the card toggle selection as well (improves mobile UX)
+              _togglePlayer(p);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.slate100),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 6, offset: const Offset(0, 2)),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    Text("${p.position} | ${p.clubName}", style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Add / Remove pill button
-              InkWell(
-                onTap: () => _togglePlayer(p),
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.rose50 : AppColors.indigo50,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    isSelected ? "Remove" : "Add",
-                    style: TextStyle(
-                      color: isSelected ? AppColors.rose500 : AppColors.indigo,
-                      fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: Row(
+                children: [
+                  // optional avatar placeholder (initials)
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppColors.indigo50,
+                    child: Text(
+                      (p.name.isNotEmpty ? p.name.split(' ').map((s) => s.isNotEmpty ? s[0] : '').take(2).join() : '?'),
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text("${p.position} | ${p.clubName}", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Add / Remove pill button
+                  InkWell(
+                    onTap: () {
+                      _togglePlayer(p);
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.rose50 : AppColors.indigo50,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        isSelected ? "Remove" : "Add",
+                        style: TextStyle(
+                          color: isSelected ? AppColors.rose500 : AppColors.indigo,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
