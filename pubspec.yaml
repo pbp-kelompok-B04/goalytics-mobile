@@ -38,7 +38,7 @@ dependencies:
   pbp_django_auth: ^0.4.0
   http: ^1.6.0
   fl_chart: ^0.69.0
-  youtube_player_iframe: ^5.2.2
+  youtube_player_iframe: ^5.2.1
 
 dev_dependencies:
   flutter_test:
