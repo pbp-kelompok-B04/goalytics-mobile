@@ -9,8 +9,32 @@ import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
 import 'package:goalytics_mobile/screens/favorite_player/favorite_players.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
 import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
+import 'package:goalytics_mobile/service/api_config.dart';
+import 'package:goalytics_mobile/models/ProfileEntry.dart';
+import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 
 const Color primaryDark = Color(0xFF0F172A);
+
+String proxiedImageUrl(String originalUrl) {
+  final raw = originalUrl.trim();
+  if (raw.isEmpty) return "";
+
+  if (raw.contains("/users/image-proxy/")) return raw;
+
+  final base = ApiConfig.baseUrl.endsWith('/')
+      ? ApiConfig.baseUrl.substring(0, ApiConfig.baseUrl.length - 1)
+      : ApiConfig.baseUrl;
+
+  final uri = Uri.tryParse(raw);
+  if (uri == null) return "";
+
+  final absolute =
+      uri.hasScheme ? raw : (raw.startsWith('/') ? "$base$raw" : "$base/$raw");
+
+  if (absolute.startsWith(base)) return absolute;
+
+  return "$base/users/image-proxy/?url=${Uri.encodeComponent(absolute)}";
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -22,29 +46,38 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String? username;
+  ProfileEntry? profile;
   bool isLoadingUser = true;
 
-  Future<void> fetchUsername() async {
+  Future<void> fetchProfile() async {
     final request = context.read<CookieRequest>();
     try {
-      final response = await request.get(
-        "https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id/auth/user-info/",
-      );
-      setState(() {
-        username = response['username'];
-        isLoadingUser = false;
-      });
+      final response = await request.get("${ApiConfig.baseUrl}/users/api/me/");
+      if (response['status'] == true && response['data'] != null) {
+        final data = response['data'];
+        setState(() {
+          profile = ProfileEntry.fromJson(data);
+          username = profile?.username;
+          isLoadingUser = false;
+        });
+      } else {
+        setState(() {
+          isLoadingUser = false;
+        });
+        print("Failed to fetch profile: ${response['message']}");
+      }
     } catch (e) {
       setState(() {
         isLoadingUser = false;
       });
+      print("Error fetching profile: $e");
     }
   }
 
   @override
   void initState() {
     super.initState();
-    fetchUsername();
+    fetchProfile();
   }
 
   @override
@@ -57,10 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
         iconTheme: const IconThemeData(
           color: Colors.white,
         ),
-        title: Text(
-          widget.title,
-          style: const TextStyle(color: Colors.white),
-        ),
+        title: Text(widget.title, style: const TextStyle(color: Colors.white)),
       ),
       backgroundColor: Colors.grey[100],
       body: isLoadingUser
@@ -71,48 +101,72 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// HEADER CARD
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: primaryDark,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryDark.withOpacity(0.35),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MyProfilePage(),
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Colors.white,
-                          child: Icon(Icons.person, size: 32),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Hi, ${username ?? 'GoalyticsUser'} 👋",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                "Welcome back to Goalytics",
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                            ],
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: primaryDark,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: primaryDark.withOpacity(0.35),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.white,
+                            foregroundImage: (profile
+                                        ?.profilePicture.isNotEmpty ??
+                                    false)
+                                ? NetworkImage(
+                                    proxiedImageUrl(profile!.profilePicture),
+                                  )
+                                : null,
+                            child: (profile?.profilePicture.isEmpty ?? true)
+                                ? const Icon(Icons.person, size: 32)
+                                : null,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Hi, ${username ?? 'GoalyticsUser'} 👋",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  "Welcome back to Goalytics",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.chevron_right,
+                            color: Colors.white70,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -142,7 +196,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   _featureCard(
                     title: "Match Prediction",
-                    description: "Predict upcoming matches and test your intuition.",
+                    description:
+                        "Predict upcoming matches and test your intuition.",
                     icon: Icons.psychology,
                   ),
                   _featureCard(
@@ -222,20 +277,30 @@ class _MyHomePageState extends State<MyHomePage> {
       borderRadius: BorderRadius.circular(16),
       onTap: () {
         if (title == "Player Comparison") {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const ComparisonScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ComparisonScreen()),
+          );
         } else if (title == "Transfer Rumours") {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const RumourListPage()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const RumourListPage()),
+          );
         } else if (title == "Find Users") {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const ExploreProfilesPage()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ExploreProfilesPage()),
+          );
         } else if (title == "Favorite Players") {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const FavoritePlayersPage()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const FavoritePlayersPage()),
+          );
         } else if (title == "Match Prediction") {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const MatchPredictionPage()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MatchPredictionPage()),
+          );
         } else if (title == "Discussion Forum") {
           Navigator.push(
             context,
@@ -266,12 +331,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontSize: 17, fontWeight: FontWeight.bold)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(description,
-                        style: const TextStyle(color: Colors.grey)),
+                    Text(
+                      description,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
                   ],
                 ),
               ),

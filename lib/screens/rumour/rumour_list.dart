@@ -5,8 +5,7 @@ import 'package:provider/provider.dart';
 import '../../models/rumour_entry.dart';
 import 'rumour_detail.dart';
 import 'rumour_form.dart';
-import '../../widgets/left_drawer.dart';
-
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 
 class RumourListPage extends StatefulWidget {
   const RumourListPage({super.key});
@@ -17,8 +16,9 @@ class RumourListPage extends StatefulWidget {
 
 class _RumourListPageState extends State<RumourListPage> {
   Future<List<RumourEntry>> fetchRumours(CookieRequest request) async {
-    final response =
-        await request.get('https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id//transfer-rumours/json/');
+    final response = await request.get(
+      'https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id//transfer-rumours/json/',
+    );
 
     List<RumourEntry> rumourList = [];
     for (var item in response) {
@@ -31,18 +31,8 @@ class _RumourListPageState extends State<RumourListPage> {
 
   String _formatDateTime(DateTime dt) {
     const months = [
-      'JAN',
-      'FEB',
-      'MAR',
-      'APR',
-      'MAY',
-      'JUN',
-      'JUL',
-      'AUG',
-      'SEP',
-      'OCT',
-      'NOV',
-      'DEC',
+      'JAN','FEB','MAR','APR','MAY','JUN',
+      'JUL','AUG','SEP','OCT','NOV','DEC',
     ];
 
     final day = dt.day.toString().padLeft(2, '0');
@@ -119,7 +109,6 @@ class _RumourListPageState extends State<RumourListPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gambar + overlay tanggal dan chip "TOP RUMOUR"
             Stack(
               children: [
                 ClipRRect(
@@ -166,8 +155,7 @@ class _RumourListPageState extends State<RumourListPage> {
               ],
             ),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -190,9 +178,7 @@ class _RumourListPageState extends State<RumourListPage> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    rumour.summary.isNotEmpty
-                        ? rumour.summary
-                        : rumour.content,
+                    rumour.summary.isNotEmpty ? rumour.summary : rumour.content,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -214,9 +200,7 @@ class _RumourListPageState extends State<RumourListPage> {
       BuildContext context, RumourEntry rumour, int index) {
     final source = _extractSource(rumour);
     final dateText = _formatDateTime(rumour.createdAt);
-
-    // simple: item2 & seterusnya label "RUMOUR"
-    final statusLabel = 'RUMOUR';
+    const statusLabel = 'RUMOUR';
 
     return GestureDetector(
       onTap: () {
@@ -243,7 +227,6 @@ class _RumourListPageState extends State<RumourListPage> {
         ),
         child: Row(
           children: [
-            // Thumbnail gambar
             ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: SizedBox(
@@ -253,8 +236,7 @@ class _RumourListPageState extends State<RumourListPage> {
                     ? Image.network(
                         rumour.coverImageUrl,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Container(
+                        errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[300],
                           child: const Center(
                             child: Icon(Icons.broken_image, size: 20),
@@ -270,12 +252,10 @@ class _RumourListPageState extends State<RumourListPage> {
               ),
             ),
             const SizedBox(width: 12),
-            // Teks
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // baris status + tanggal
                   Row(
                     children: [
                       _buildChip(
@@ -331,9 +311,7 @@ class _RumourListPageState extends State<RumourListPage> {
   Future<void> _goToNewRumourForm(BuildContext context) async {
     final refresh = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const RumourFormPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const RumourFormPage()),
     );
     if (refresh == true && mounted) {
       setState(() {});
@@ -345,16 +323,8 @@ class _RumourListPageState extends State<RumourListPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      drawer: const LeftDrawer(),
       backgroundColor: const Color(0xFFF5F6FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F6FA),
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: Colors.black,   
-      ),
-      automaticallyImplyLeading: true,
-    ),
+      bottomNavigationBar: const BottomNav(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -371,7 +341,6 @@ class _RumourListPageState extends State<RumourListPage> {
                 ),
               ),
               const SizedBox(height: 6),
-              // Judul + tombol New Rumour
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -397,10 +366,7 @@ class _RumourListPageState extends State<RumourListPage> {
                       ),
                       elevation: 0,
                     ),
-                    icon: const Icon(
-                      Icons.add,
-                      size: 18,
-                    ),
+                    icon: const Icon(Icons.add, size: 18),
                     label: const Text(
                       'New Rumour',
                       style: TextStyle(
@@ -412,7 +378,6 @@ class _RumourListPageState extends State<RumourListPage> {
                 ],
               ),
               const SizedBox(height: 6),
-              // Deskripsi
               Text(
                 'The latest moves, whispers, and confirmed deals curated by the Goalytics newsroom.',
                 style: TextStyle(
@@ -422,7 +387,6 @@ class _RumourListPageState extends State<RumourListPage> {
                 ),
               ),
               const SizedBox(height: 18),
-              // List rumour
               Expanded(
                 child: FutureBuilder<List<RumourEntry>>(
                   future: fetchRumours(request),
@@ -469,7 +433,6 @@ class _RumourListPageState extends State<RumourListPage> {
           ),
         ),
       ),
-      // FAB dihapus supaya layout mirip Figma
     );
   }
 }
