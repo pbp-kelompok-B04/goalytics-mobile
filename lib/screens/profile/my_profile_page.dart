@@ -8,6 +8,7 @@ import '../../models/ProfileEntry.dart';
 import '../../service/api_config.dart';
 import 'package:goalytics_mobile/widgets/bottom_nav.dart'; 
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
+import 'package:goalytics_mobile/screens/login.dart';
 
 String formatJoinedMonthYear(String iso) {
   final raw = iso.trim();
@@ -588,22 +589,74 @@ class _ProfileHeroCard extends StatelessWidget {
                 radius: 36,
               ),
               const Spacer(),
-              SizedBox(
-                height: 40,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF101828),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF101828),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      elevation: 0,
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    elevation: 0,
+                    onPressed: onToggleEdit,
+                    icon: Icon(isEditing ? Icons.close : Icons.edit, size: 18),
+                    label: Text(isEditing ? "Close" : "Edit Profile"),
                   ),
-                  onPressed: onToggleEdit,
-                  icon:
-                      Icon(isEditing ? Icons.close : Icons.edit, size: 18),
-                  label: Text(isEditing ? "Close" : "Edit Profile"),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEF4444),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      elevation: 0,
+                    ),
+                    onPressed: () async {
+                      final request = context.read<CookieRequest>();
+                      final response = await request.logout(
+                        "${ApiConfig.baseUrl}/auth/logout/",
+                      );
+
+                      if (!context.mounted) return;
+
+                      if (response['status'] == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              response['message'] ?? 'Logged out successfully!',
+                            ),
+                            backgroundColor: const Color(0xFF0F172A),
+                          ),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(response['message'] ?? 'Logout failed.'),
+                            backgroundColor: const Color(0xFFEF4444),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.logout, size: 18),
+                    label: const Text("Logout"),
+                  ),
                 ),
               ),
             ],
