@@ -4,6 +4,9 @@ Platform mobile interaktif untuk penggemar sepak bola yang ingin mengakses stati
 
 Aplikasi ini hadir untuk menjawab kebutuhan pengguna yang selama ini harus mencari data pemain, forum diskusi, dan insight pertandingan dari sumber yang tersebar. Goalytics Mobile menyatukan semuanya dalam satu ekosistem lengkap — cepat, ringkas, dan mobile-friendly.
 
+## Video Promosi
+https://youtu.be/fNdzJhCpEY4?si=ej3ABbM-FNgQTiTm
+
 ## Install
 ![Build Status](https://app.bitrise.io/app/413c8e52-48e3-41e6-a98a-5bb163d0d127/status.svg?token=hPfG1Ehpdx2MLieN_gPyYg&branch=main)
 
