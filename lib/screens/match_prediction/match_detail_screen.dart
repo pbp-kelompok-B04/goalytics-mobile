@@ -125,13 +125,12 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
-    // Nama Klub (Handle TBD jika data belum masuk)
     String homeName = widget.match.fields.homeClubName ?? 'Home';
     String awayName = widget.match.fields.awayClubName ?? 'Away';
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      extendBodyBehindAppBar: true, // Agar AppBar transparan di atas header berwarna
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -140,7 +139,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          // Admin Actions (Menu Titik Tiga Premium)
           if (_isManager)
             Theme(
               data: Theme.of(context).copyWith(
@@ -164,7 +162,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
                       Navigator.pop(context, true);
                     }
                   } else if (value == 'delete') {
-                    // Logika Delete (dengan dialog konfirmasi yang sudah ada)
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
@@ -195,7 +192,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
                       ],
                     ),
                   ),
-                  const PopupMenuDivider(), // Garis pemisah tipis
+                  const PopupMenuDivider(),
                   const PopupMenuItem<String>(
                     value: 'delete',
                     child: Row(
@@ -210,13 +207,12 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
               ),
             ),
 
-          const SizedBox(width: 8), // Sedikit jarak dari kanan layar
+          const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 1. & 2. HEADER SECTION (Match Info)
             _buildMatchHeader(homeName, awayName),
 
             Padding(
@@ -224,14 +220,12 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // 3. PREDICTION FORM
                   _buildPredictionForm(request, homeName, awayName),
 
                   const SizedBox(height: 40),
                   const Divider(),
                   const SizedBox(height: 20),
 
-                  // 4. COMMUNITY PREDICTIONS TITLE
                   Text(
                     "Community Predictions",
                     style: TextStyle(
@@ -242,12 +236,10 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // 5. FILTER BUTTON
                   _buildFilterDropdown(),
 
                   const SizedBox(height: 20),
 
-                  // 6. LIST PREDICTIONS
                   FutureBuilder(
                     future: fetchPredictions(request),
                     builder: (context, AsyncSnapshot snapshot) {
@@ -285,17 +277,15 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     );
   }
 
-  // --- WIDGET BUILDERS ---
 
   Widget _buildMatchHeader(String homeName, String awayName) {
-    // Format Tanggal
     String rawDate = widget.match.fields.matchDatetime.toString();
     String date = rawDate.length > 10 ? rawDate.substring(0, 10) : rawDate;
     String time = rawDate.length > 16 ? rawDate.substring(11, 16) : "";
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 100, 20, 30), // Padding atas besar untuk kompensasi AppBar transparan
+      padding: const EdgeInsets.fromLTRB(20, 100, 20, 30),
       decoration: BoxDecoration(
         color: _themeColor,
         borderRadius: const BorderRadius.only(
@@ -308,7 +298,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       ),
       child: Column(
         children: [
-          // Info Tanggal & Venue
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -330,7 +319,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Match Title
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -564,7 +552,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Header: User & Admin Delete
             Row(
               children: [
                 CircleAvatar(
@@ -606,7 +593,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Score Badge (Centerpiece)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
@@ -620,7 +606,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Explanation
             SizedBox(
               width: double.infinity,
               child: Text(
@@ -631,7 +616,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Footer: Upvote
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

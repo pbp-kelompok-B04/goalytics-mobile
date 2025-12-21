@@ -93,13 +93,11 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Header Section (Typography Modern)
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Bagian Teks (Kiri)
                     Expanded(
                       flex: 3,
                       child: Column(
@@ -108,7 +106,7 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                           Text(
                             "Football Match\nPrediction",
                             style: TextStyle(
-                              fontSize: 28, // Sedikit disesuaikan agar muat
+                              fontSize: 28,
                               fontWeight: FontWeight.w800,
                               color: _themeColor,
                               height: 1.1,
@@ -126,17 +124,17 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                         ],
                       ),
                     ),
-                    // Bagian Visual/Icon (Kanan)
+
                     Expanded(
                       flex: 1,
                       child: Container(
                         height: 80,
                         decoration: BoxDecoration(
-                          color: _themeColor.withOpacity(0.1), // Background kotak tipis
+                          color: _themeColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Icon(
-                          Icons.insights, // Icon grafik/prediksi
+                          Icons.insights,
                           size: 40,
                           color: _themeColor,
                         ),
@@ -147,7 +145,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
 
                 const SizedBox(height: 30),
 
-                // 2. Section Title "Upcoming Games"
                 Row(
                   children: [
                     Icon(Icons.calendar_month_outlined, size: 20, color: _themeColor),
@@ -164,7 +161,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // List Matches
                 FutureBuilder(
                   future: fetchMatches(request),
                   builder: (context, AsyncSnapshot snapshot) {
@@ -190,7 +186,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                         ),
                       );
                     } else {
-                      // ListView di dalam Column harus pake shrinkWrap & physics ini
                       return ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -204,7 +199,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                   },
                 ),
 
-                // Extra space di bawah agar tidak ketutupan FAB
                 const SizedBox(height: 80),
               ],
             ),
@@ -214,9 +208,7 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
     );
   }
 
-  // 4, 5, 6. Custom Card Widget untuk Match
   Widget _buildMatchCard(BuildContext context, Match match) {
-    // Format tanggal sederhana: YYYY-MM-DD HH:MM
     String rawDate = match.fields.matchDatetime.toString();
     String date = rawDate.length > 16 ? rawDate.substring(0, 16).replaceAll('T', ' • ') : rawDate;
 
@@ -256,7 +248,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
-                // Header Card: Date & Venue (Small, Grey)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -283,14 +274,12 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
 
                 const SizedBox(height: 20),
 
-                // Main Content: Team A vs Team B
                 Row(
                   children: [
-                    // Home Team (Expanded agar nama panjang turun ke bawah)
                     Expanded(
                       child: Column(
                         children: [
-                          _buildTeamAvatar(homeTeam), // Inisial Klub
+                          _buildTeamAvatar(homeTeam),
                           const SizedBox(height: 8),
                           Text(
                             homeTeam,
@@ -305,7 +294,7 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                       ),
                     ),
 
-                    // VS Badge
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Container(
@@ -326,11 +315,10 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                       ),
                     ),
 
-                    // Away Team
                     Expanded(
                       child: Column(
                         children: [
-                          _buildTeamAvatar(awayTeam), // Inisial Klub
+                          _buildTeamAvatar(awayTeam),
                           const SizedBox(height: 8),
                           Text(
                             awayTeam,
@@ -356,7 +344,6 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
     );
   }
 
-  // Widget kecil untuk membuat Avatar inisial (misal: "Arsenal" -> "A")
   Widget _buildTeamAvatar(String teamName) {
     return Container(
       width: 50,
