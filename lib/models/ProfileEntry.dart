@@ -46,7 +46,7 @@ class ProfileEntry {
       instagramUrl: json['instagram_url'] ?? '',
       xUrl: json['x_url'] ?? '',
       websiteUrl: json['website_url'] ?? '',
-      role: json['role'] ?? '',
+      role: (json["role"] ?? "").toString(),
       memberSince: (json["member_since"]),
 
     );
