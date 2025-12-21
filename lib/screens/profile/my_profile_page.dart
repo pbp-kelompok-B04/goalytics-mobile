@@ -100,6 +100,11 @@ class MyProfilePage extends StatefulWidget {
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
+  List<Map<String, dynamic>> _clubs = [];
+  List<String> _leagues = [];
+  int? _selectedClubId;
+  String? _selectedLeague;
+  bool _loadingDropdowns = false;
   ProfileEntry? _profile;
   bool _isLoading = true;
   bool _isEditing = false;
@@ -166,6 +171,19 @@ class _MyProfilePageState extends State<MyProfilePage> {
     }
   }
 
+  Future<void> _loadDropdownData(CookieRequest request) async {
+  setState(() => _loadingDropdowns = true);
+  try {
+    final clubsRes = await request.get("${ApiConfig.baseUrl}/data/api/clubs/");
+    final leaguesRes = await request.get("${ApiConfig.baseUrl}/data/api/leagues/");
+
+    _clubs = List<Map<String, dynamic>>.from(clubsRes["data"] ?? []);
+    _leagues = List<String>.from(leaguesRes["results"] ?? []);
+  } finally {
+    if (mounted) setState(() => _loadingDropdowns = false);
+  }
+}
+
   Future<void> _saveProfile(CookieRequest request) async {
     if (_profile == null) return;
     if (!_formKey.currentState!.validate()) return;
@@ -182,7 +200,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
       ..instagramUrl = _instagramController.text.trim()
       ..xUrl = _xController.text.trim()
       ..websiteUrl = _websiteController.text.trim()
-      ..profilePicture = _profilePictureController.text.trim();
+      ..profilePicture = _profilePictureController.text.trim()
+      ..favoriteTeamId = _selectedClubId
+      ..favoriteLeague = _selectedLeague ?? "";
 
     try {
       final body = jsonEncode(_profile!.toUpdateJson());
@@ -264,10 +284,19 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               _ProfileHeroCard(
                                 profile: _profile!,
                                 isEditing: _isEditing,
-                                onToggleEdit: () {
-                                  setState(() {
-                                    _isEditing = !_isEditing;
-                                  });
+                                onToggleEdit: () async {
+                                  setState(() => _isEditing = !_isEditing);
+                                  if (_isEditing) {
+                                    final request = context.read<CookieRequest>();
+                                    await _loadDropdownData(request);
+
+                                    setState(() {
+                                      _selectedClubId = _profile?.favoriteTeamId;
+                                      _selectedLeague = (_profile?.favoriteLeague.isNotEmpty ?? false)
+                                          ? _profile!.favoriteLeague
+                                          : null;
+                                    });
+                                  }
                                 },
                               ),
                               const SizedBox(height: 16),
@@ -291,25 +320,47 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                       const SizedBox(height: 12),
                                       _LabeledField(
                                         label: "Tim favorit",
-                                        child: TextFormField(
-                                          controller: _favoriteTeamController,
+                                        child: DropdownButtonFormField<int>(
+                                          value: _selectedClubId,
+                                          isExpanded: true,
                                           decoration: const InputDecoration(
-                                            hintText: "Contoh: Manchester United",
                                             border: OutlineInputBorder(),
                                             isDense: true,
                                           ),
+                                          hint: const Text("Pilih klub"),
+                                          items: _clubs.map((c) {
+                                            final id = c["id"] as int;
+                                            final name = (c["name"] ?? "").toString();
+                                            return DropdownMenuItem<int>(
+                                              value: id,
+                                              child: Text(name),
+                                            );
+                                          }).toList(),
+                                          onChanged: (val) {
+                                            setState(() => _selectedClubId = val);
+                                          },
                                         ),
                                       ),
                                       const SizedBox(height: 12),
                                       _LabeledField(
                                         label: "Liga favorit",
-                                        child: TextFormField(
-                                          controller: _favoriteLeagueController,
+                                        child: DropdownButtonFormField<String>(
+                                          value: _selectedLeague,
+                                          isExpanded: true,
                                           decoration: const InputDecoration(
-                                            hintText: "Contoh: Premier League",
                                             border: OutlineInputBorder(),
                                             isDense: true,
                                           ),
+                                          hint: const Text("Pilih liga"),
+                                          items: _leagues.map((lg) {
+                                            return DropdownMenuItem<String>(
+                                              value: lg,
+                                              child: Text(lg),
+                                            );
+                                          }).toList(),
+                                          onChanged: (val) {
+                                            setState(() => _selectedLeague = val);
+                                          },
                                         ),
                                       ),
                                       const SizedBox(height: 12),

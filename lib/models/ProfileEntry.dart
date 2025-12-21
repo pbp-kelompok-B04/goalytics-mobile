@@ -61,7 +61,7 @@ class ProfileEntry {
       "instagram_url": instagramUrl,
       "x_url": xUrl,
       "website_url": websiteUrl,
-      "favorite_team": favoriteTeam,
+      "favorite_team_id": favoriteTeamId,
     };
   }
 }
