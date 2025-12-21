@@ -6,6 +6,30 @@ import 'package:provider/provider.dart';
 
 import '../../models/ProfileEntry.dart';
 import '../../service/api_config.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart'; 
+
+
+String formatJoinedMonthYear(String iso) {
+  final raw = iso.trim();
+  if (raw.isEmpty) return "-";
+
+  final dt = DateTime.tryParse(raw);
+  if (dt == null) return "-";
+
+  const months = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+  ];
+
+  final m = months[dt.month - 1];
+  return "$m ${dt.year}";
+}
+
+String prettyRole(String roleRaw) {
+  final r = roleRaw.trim();
+  if (r.isEmpty) return "User";
+  return r[0].toUpperCase() + r.substring(1);
+}
 
 String proxiedImageUrl(String originalUrl) {
   final raw = originalUrl.trim();
@@ -37,9 +61,10 @@ Widget profileAvatar({
   if (url.isEmpty) {
     return CircleAvatar(
       radius: radius,
+      backgroundColor: Colors.white,
       child: Text(
         fallbackText.isNotEmpty ? fallbackText[0].toUpperCase() : "?",
-        style: TextStyle(fontSize: radius * 0.75),
+        style: TextStyle(fontSize: radius * 0.75, color: Colors.black),
       ),
     );
   }
@@ -47,6 +72,7 @@ Widget profileAvatar({
   final size = radius * 2;
   return CircleAvatar(
     radius: radius,
+    backgroundColor: Colors.white,
     child: ClipOval(
       child: Image.network(
         url,
@@ -57,7 +83,7 @@ Widget profileAvatar({
           return Center(
             child: Text(
               fallbackText.isNotEmpty ? fallbackText[0].toUpperCase() : "?",
-              style: TextStyle(fontSize: radius * 0.75),
+              style: TextStyle(fontSize: radius * 0.75, color: Colors.black),
             ),
           );
         },
@@ -83,12 +109,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _favoriteTeamController = TextEditingController();
-  final TextEditingController _favoriteLeagueController = TextEditingController();
-  final TextEditingController _preferredPositionController = TextEditingController();
+  final TextEditingController _favoriteLeagueController =
+      TextEditingController();
+  final TextEditingController _preferredPositionController =
+      TextEditingController();
   final TextEditingController _instagramController = TextEditingController();
   final TextEditingController _xController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
-  final TextEditingController _profilePictureController = TextEditingController();
+  final TextEditingController _profilePictureController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -130,6 +159,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       setState(() {
         _isLoading = false;
       });
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Gagal memuat profil: $e")),
       );
@@ -209,217 +239,412 @@ class _MyProfilePageState extends State<MyProfilePage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Profile"),
-        actions: [
-          if (!_isLoading && _profile != null)
-            IconButton(
-              icon: Icon(_isEditing ? Icons.close : Icons.edit),
-              onPressed: () {
-                setState(() {
-                  _isEditing = !_isEditing;
-                });
-              },
-            ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _profile == null
-              ? const Center(child: Text("Gagal memuat profil."))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Form(
+      backgroundColor: const Color(0xFFF4F5F7),
+      bottomNavigationBar: const BottomNav(),
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _profile == null
+                ? const Center(child: Text("Gagal memuat profil."))
+                : Form(
                     key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
                       children: [
-                        Row(
-                          children: [
-                            profileAvatar(
-                              imageUrl: _profile!.profilePicture,
-                              fallbackText: _profile!.username,
-                              radius: 32,
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _profile!.name,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "@${_profile!.username}",
-                                    style:
-                                        const TextStyle(color: Colors.grey),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    _profile!.email,
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                ],
+                        Container(
+                          height: 170,
+                          width: double.infinity,
+                          color: Colors.black,
+                        ),
+
+                        SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(16, 68, 16, 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _ProfileHeroCard(
+                                profile: _profile!,
+                                isEditing: _isEditing,
+                                onToggleEdit: () {
+                                  setState(() {
+                                    _isEditing = !_isEditing;
+                                  });
+                                },
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
+                              const SizedBox(height: 16),
 
-                        Text(
-                          "Bio",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        _isEditing
-                            ? TextFormField(
-                                controller: _bioController,
-                                maxLines: 3,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: "Tulis bio kamu...",
-                                ),
-                              )
-                            : Text(_profile!.bio.isEmpty
-                                ? "Belum ada bio"
-                                : _profile!.bio),
-                        const SizedBox(height: 24),
-
-                        Text(
-                          "Preferensi Sepak Bola",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-
-                        _buildEditableRow(
-                          label: "Tim favorit",
-                          isEditing: _isEditing,
-                          controller: _favoriteTeamController,
-                          displayValue: _profile!.favoriteTeam,
-                          hintText: "Contoh: FC Barcelona",
-                        ),
-                        const SizedBox(height: 8),
-
-                        _buildEditableRow(
-                          label: "Liga favorit",
-                          isEditing: _isEditing,
-                          controller: _favoriteLeagueController,
-                          displayValue: _profile!.favoriteLeague,
-                          hintText: "Contoh: La Liga, Premier League",
-                        ),
-                        const SizedBox(height: 8),
-
-                        _buildEditableRow(
-                          label: "Posisi favorit",
-                          isEditing: _isEditing,
-                          controller: _preferredPositionController,
-                          displayValue: _profile!.preferredPosition,
-                          hintText: "Contoh: Striker, Winger",
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        Text(
-                          "Media Sosial",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-
-                        _buildEditableRow(
-                          label: "Instagram",
-                          isEditing: _isEditing,
-                          controller: _instagramController,
-                          displayValue: _profile!.instagramUrl,
-                          hintText: "https://instagram.com/username",
-                        ),
-                        const SizedBox(height: 8),
-
-                        _buildEditableRow(
-                          label: "X (Twitter)",
-                          isEditing: _isEditing,
-                          controller: _xController,
-                          displayValue: _profile!.xUrl,
-                          hintText: "https://x.com/username",
-                        ),
-                        const SizedBox(height: 8),
-
-                        _buildEditableRow(
-                          label: "Website",
-                          isEditing: _isEditing,
-                          controller: _websiteController,
-                          displayValue: _profile!.websiteUrl,
-                          hintText: "https://example.com",
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        Text(
-                          "Foto Profil (URL)",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        _isEditing
-                            ? TextFormField(
-                                controller: _profilePictureController,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: "https://...",
-                                ),
-                              )
-                            : Text(_profile!.profilePicture.isEmpty
-                                ? "Belum diatur"
-                                : _profile!.profilePicture),
-
-                        const SizedBox(height: 24),
-
-                        if (_isEditing)
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed:
-                                  _isSaving ? null : () => _saveProfile(request),
-                              child: _isSaving
-                                  ? const SizedBox(
-                                      height: 18,
-                                      width: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
+                              if (_isEditing) ...[
+                                _SectionCard(
+                                  title: "Edit Profile",
+                                  child: Column(
+                                    children: [
+                                      _LabeledField(
+                                        label: "Bio",
+                                        child: TextFormField(
+                                          controller: _bioController,
+                                          maxLines: 3,
+                                          decoration: const InputDecoration(
+                                            hintText: "Tulis bio kamu...",
+                                            border: OutlineInputBorder(),
+                                          ),
+                                        ),
                                       ),
-                                    )
-                                  : const Text("Save changes"),
-                            ),
+                                      const SizedBox(height: 12),
+                                      _LabeledField(
+                                        label: "Tim favorit",
+                                        child: TextFormField(
+                                          controller: _favoriteTeamController,
+                                          decoration: const InputDecoration(
+                                            hintText: "Contoh: Manchester United",
+                                            border: OutlineInputBorder(),
+                                            isDense: true,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _LabeledField(
+                                        label: "Liga favorit",
+                                        child: TextFormField(
+                                          controller: _favoriteLeagueController,
+                                          decoration: const InputDecoration(
+                                            hintText: "Contoh: Premier League",
+                                            border: OutlineInputBorder(),
+                                            isDense: true,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _LabeledField(
+                                        label: "Posisi favorit",
+                                        child: TextFormField(
+                                          controller:
+                                              _preferredPositionController,
+                                          decoration: const InputDecoration(
+                                            hintText: "Contoh: Winger",
+                                            border: OutlineInputBorder(),
+                                            isDense: true,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _LabeledField(
+                                        label: "Instagram",
+                                        child: TextFormField(
+                                          controller: _instagramController,
+                                          decoration: const InputDecoration(
+                                            hintText:
+                                                "https://instagram.com/username",
+                                            border: OutlineInputBorder(),
+                                            isDense: true,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _LabeledField(
+                                        label: "X (Twitter)",
+                                        child: TextFormField(
+                                          controller: _xController,
+                                          decoration: const InputDecoration(
+                                            hintText: "https://x.com/username",
+                                            border: OutlineInputBorder(),
+                                            isDense: true,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _LabeledField(
+                                        label: "Website",
+                                        child: TextFormField(
+                                          controller: _websiteController,
+                                          decoration: const InputDecoration(
+                                            hintText: "https://example.com",
+                                            border: OutlineInputBorder(),
+                                            isDense: true,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _LabeledField(
+                                        label: "Foto Profil (URL)",
+                                        child: TextFormField(
+                                          controller:
+                                              _profilePictureController,
+                                          decoration: const InputDecoration(
+                                            hintText: "https://...",
+                                            border: OutlineInputBorder(),
+                                            isDense: true,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 48,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFF101828),
+                                            foregroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          onPressed: _isSaving
+                                              ? null
+                                              : () => _saveProfile(request),
+                                          child: _isSaving
+                                              ? const SizedBox(
+                                                  height: 18,
+                                                  width: 18,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                  ),
+                                                )
+                                              : const Text("Save changes"),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ] else ...[
+                                _SectionCard(
+                                  title: "Preferensi Sepak Bola",
+                                  child: Column(
+                                    children: [
+                                      _InfoRow(
+                                        label: "Tim favorit",
+                                        value: _profile!.favoriteTeam,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _InfoRow(
+                                        label: "Liga favorit",
+                                        value: _profile!.favoriteLeague,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _InfoRow(
+                                        label: "Posisi favorit",
+                                        value: _profile!.preferredPosition,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                _SectionCard(
+                                  title: "Media Sosial",
+                                  child: Column(
+                                    children: [
+                                      _InfoRow(
+                                        label: "Instagram",
+                                        value: _profile!.instagramUrl,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _InfoRow(
+                                        label: "X",
+                                        value: _profile!.xUrl,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _InfoRow(
+                                        label: "Website",
+                                        value: _profile!.websiteUrl,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
+                        ),
                       ],
                     ),
                   ),
-                ),
+      ),
     );
   }
+}
 
-  Widget _buildEditableRow({
-    required String label,
-    required bool isEditing,
-    required TextEditingController controller,
-    required String displayValue,
-    String? hintText,
-  }) {
+
+class _ProfileHeroCard extends StatelessWidget {
+  final ProfileEntry profile;
+  final bool isEditing;
+  final VoidCallback onToggleEdit;
+
+  const _ProfileHeroCard({
+    required this.profile,
+    required this.isEditing,
+    required this.onToggleEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final roleText = prettyRole(profile.role);
+    final joinedText =
+        "Joined ${formatJoinedMonthYear(profile.memberSince)}";
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              profileAvatar(
+                imageUrl: profile.profilePicture,
+                fallbackText: profile.username,
+                radius: 36,
+              ),
+              const Spacer(),
+              SizedBox(
+                height: 40,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF101828),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    elevation: 0,
+                  ),
+                  onPressed: onToggleEdit,
+                  icon:
+                      Icon(isEditing ? Icons.close : Icons.edit, size: 18),
+                  label: Text(isEditing ? "Close" : "Edit Profile"),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          Text(
+            "@${profile.username}",
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF667085),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEDE9FE),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              roleText,
+              style: const TextStyle(
+                color: Color(0xFF7C3AED),
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          Text(
+            profile.bio.isEmpty ? "Belum ada bio" : profile.bio,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF344054),
+              height: 1.35,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          Row(
+            children: [
+              const Icon(Icons.calendar_month,
+                  size: 18, color: Color(0xFF667085)),
+              const SizedBox(width: 8),
+              Text(
+                joinedText,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF667085),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+class _SectionCard extends StatelessWidget {
+  final String title;
+  final Widget child;
+
+  const _SectionCard({required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF101828),
+            ),
+          ),
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -427,22 +652,48 @@ class _MyProfilePageState extends State<MyProfilePage> {
           width: 110,
           child: Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF101828),
+            ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 10),
         Expanded(
-          child: isEditing
-              ? TextFormField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    hintText: hintText,
-                    isDense: true,
-                  ),
-                )
-              : Text(displayValue.isEmpty ? "-" : displayValue),
+          child: Text(
+            value.isEmpty ? "-" : value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF344054),
+            ),
+          ),
         ),
+      ],
+    );
+  }
+}
+
+class _LabeledField extends StatelessWidget {
+  final String label;
+  final Widget child;
+
+  const _LabeledField({required this.label, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF101828),
+            fontSize: 12,
+          ),
+        ),
+        const SizedBox(height: 6),
+        child,
       ],
     );
   }

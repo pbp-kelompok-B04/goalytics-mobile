@@ -7,6 +7,7 @@ import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_editor_sheet.dart
 import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_home_content.dart';
 import 'package:goalytics_mobile/widgets/Forum/forumHome/forum_notification_sheet.dart';
 import 'package:goalytics_mobile/widgets/left_drawer.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_delete_sheet.dart';
@@ -273,6 +274,7 @@ class _ForumHomeScreenState extends State<ForumHomeScreen> {
       return Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
         body: SafeArea(child: content),
+        bottomNavigationBar: const BottomNav(),
       );
     }
 

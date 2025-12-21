@@ -7,6 +7,7 @@ import 'package:goalytics_mobile/widgets/Forum/post/post_back_button.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_card.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_discussion_section.dart';
 import 'package:goalytics_mobile/widgets/left_drawer.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_delete_sheet.dart';
@@ -463,9 +464,13 @@ void _confirmDelete(ForumComment comment) {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF475569)),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
         body: page,
+        bottomNavigationBar: const BottomNav(),
       );
     }
 

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/comparison_model.dart';
 import '../../service/comparison_service.dart';
 import 'comparison_screen.dart';
-import '../../widgets/left_drawer.dart';
+import '../../widgets/bottom_nav.dart';
 
 class ComparisonHistoryScreen extends StatefulWidget {
   const ComparisonHistoryScreen({super.key});
@@ -22,7 +22,6 @@ class _ComparisonHistoryScreenState extends State<ComparisonHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    // Load data setelah frame pertama dirender
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadHistory();
     });
@@ -51,25 +50,17 @@ class _ComparisonHistoryScreenState extends State<ComparisonHistoryScreen> {
     }
   }
 
-  // ==========================================
-  // NAVIGASI (SOLUSI LAYAR PUTIH)
-  // ==========================================
-
-  // 1. Buat Baru (Create)
   void createNewComparison() async {
-    // PENTING: Gunakan PUSH, bukan PushReplacement
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ComparisonScreen()),
     );
 
-    // Jika result == true (berarti sukses save), refresh list
     if (result == true) {
       loadHistory();
     }
   }
 
-  // 2. Edit Existing
   void editComparison(Comparison c) async {
     final result = await Navigator.push(
       context,
@@ -86,7 +77,6 @@ class _ComparisonHistoryScreenState extends State<ComparisonHistoryScreen> {
     }
   }
 
-  // 3. View Detail
   void viewComparison(Comparison c) {
     Navigator.push(
       context,
@@ -125,22 +115,28 @@ class _ComparisonHistoryScreenState extends State<ComparisonHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      drawer: const LeftDrawer(),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const ComparisonScreen()),
+            );
+          },
+        ),
         title: const Text("Comparison History", style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: loadHistory, tooltip: 'Refresh'),
         ],
       ),
-      
-      // Tombol Tambah di Pojok Kanan Bawah
+      bottomNavigationBar: const BottomNav(),
       floatingActionButton: FloatingActionButton(
         onPressed: createNewComparison,
-        backgroundColor: const Color(0xFF0F172A), // Slate 900
+        backgroundColor: const Color(0xFF0F172A), 
         child: const Icon(Icons.add, color: Colors.white),
       ),
-
       body: isLoading 
           ? const Center(child: CircularProgressIndicator()) 
           : hasError 
@@ -167,7 +163,6 @@ class _ComparisonHistoryScreenState extends State<ComparisonHistoryScreen> {
           const Text("Start comparing players to build history", style: TextStyle(color: Colors.grey)),
           const SizedBox(height: 30),
           ElevatedButton(
-            // GUNAKAN FUNGSI YANG BARU (createNewComparison)
             onPressed: createNewComparison,
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F172A), foregroundColor: Colors.white),
             child: const Text("Start Comparing"),

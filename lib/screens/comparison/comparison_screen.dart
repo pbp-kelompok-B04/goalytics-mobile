@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:goalytics_mobile/menu.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart'; // Pastikan fl_chart ada di pubspec.yaml
+import 'package:fl_chart/fl_chart.dart';
 import '/models/comparison_model.dart';
 import '/service/player_service.dart';
 import '/service/comparison_service.dart';
-import 'package:goalytics_mobile/widgets/left_drawer.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:goalytics_mobile/screens/comparison/comparison_history_screen.dart';
 
-// ==========================================
-// PALETTE WARNA (Sesuai Tailwind Slate & Emerald)
-// ==========================================
+
 class AppColors {
   static const slate50 = Color(0xFFF8FAFC);
   static const slate100 = Color(0xFFF1F5F9);
@@ -52,7 +51,6 @@ class ComparisonScreen extends StatefulWidget {
 }
 
 class _ComparisonScreenState extends State<ComparisonScreen> {
-  // State Variables
   Player? player1;
   Player? player2;
   List<Player> suggestions1 = [];
@@ -82,7 +80,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     super.didChangeDependencies();
     _request = Provider.of<CookieRequest>(context, listen: false);
     
-    // Auto Load Logic
     if (widget.comparisonId != null) {
       _loadComparisonDetails();
     } else if (widget.player1Id != null && widget.player2Id != null) {
@@ -97,8 +94,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     notesController.dispose();
     super.dispose();
   }
-
-  // ================= LOGIC LOADERS (Sama seperti sebelumnya) =================
 
   Future<void> _loadPlayersByIds() async {
     if (_request == null) return;
@@ -129,17 +124,14 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     setState(() => loadingPlayers = true);
     
     try {
-      // 1. Panggil Service
       final data = await ComparisonService.getComparisonDetail(
         widget.comparisonId!,
         _request!,
       );
       
-      // 2. Ambil data 'comparison' dari response JSON
-      final comparison = data['comparison']; // Pastikan sesuai dengan views.py
+      final comparison = data['comparison'];
       
       if (comparison != null) {
-        // 3. Load Player 1
         final player1Id = comparison['player1_id'];
         if (player1Id != null) {
           final p1 = await PlayerService.getPlayerById(player1Id, _request!);
@@ -149,7 +141,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
           });
         }
         
-        // 4. Load Player 2
         final player2Id = comparison['player2_id'];
         if (player2Id != null) {
           final p2 = await PlayerService.getPlayerById(player2Id, _request!);
@@ -159,13 +150,10 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
           });
         }
         
-        // 5. Set Notes
         final notes = comparison['notes'] ?? '';
         notesController.text = notes;
         
-        // 6. Auto Compare (Trigger)
         if (player1 != null && player2 != null) {
-          // Beri jeda sedikit agar UI render dulu
           await Future.delayed(const Duration(milliseconds: 500));
           await comparePlayers();
         }
@@ -183,8 +171,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
       }
     }
   }
-
-  // ================= LOGIC SEARCH & COMPARE =================
 
   Future<void> searchPlayer(String query, int num) async {
     if (query.length < 2) {
@@ -208,7 +194,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
         p2Controller.text = player.name;
         suggestions2.clear();
       }
-      // Reset result jika player berubah
       hasResult = false;
       result = null;
     });
@@ -235,7 +220,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     setState(() => isLoading = true);
     
     try {
-      // Panggil API compare (tanpa perlu token auth krn public di HTML pun public)
       final data = await PlayerService.comparePlayers(
         player1Id: player1!.id, 
         player2Id: player2!.id
@@ -252,10 +236,7 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     }
   }
 
-  // ================= LOGIC SAVE (FIXED) =================
-
   Future<void> saveOrUpdateComparison() async {
-    // 1. Validasi
     if (_request == null || player1 == null || player2 == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -265,11 +246,9 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
       return;
     }
 
-    // 2. Loading...
     setState(() => isLoading = true); 
 
     try {
-      // 3. Panggil API
       final success = await ComparisonService.saveComparison(
         request: _request!,
         player1Id: player1!.id,
@@ -283,9 +262,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
       setState(() => isLoading = false);
 
       if (success) {
-        // === PERBAIKAN DI SINI ===
-        // Jangan pakai pop(), tapi paksa pindah ke History Screen
-        // Ini mencegah layar putih jika stack navigasi kosong
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -319,35 +295,39 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     }
   }
 
-  // ================= UI BUILDER =================
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(), // Unfocus keyboard
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        backgroundColor: AppColors.slate50, // Matches HTML bg-slate-50
+        backgroundColor: AppColors.slate50,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: AppColors.slate700),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
+          automaticallyImplyLeading: false, // Tetap false
+          leading: IconButton( // TAMBAH INI - tombol di kiri
+            icon: const Icon(Icons.arrow_back, color: AppColors.slate700),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MyHomePage(title: "Goalytics"),
+                ),
+              );
+            },
           ),
-
           title: const Text(
             "Player Comparison",
             style: TextStyle(color: AppColors.slate900, fontWeight: FontWeight.w700),
           ),
           centerTitle: true,
+          // HAPUS actions: [] karena sudah dipindah ke leading
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1.0),
             child: Container(color: AppColors.slate200, height: 1.0),
           ),
         ),
-        drawer: LeftDrawer(),
+        bottomNavigationBar: const BottomNav(),
         body: Stack(
           children: [
             SingleChildScrollView(
@@ -355,7 +335,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // HEADER SECTION
                   const Text(
                     "COMPARISON",
                     style: TextStyle(
@@ -379,10 +358,8 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
                   
                   const SizedBox(height: 32),
 
-                  // PLAYER INPUT SECTION (Card Style)
                   _buildPlayerInputCard(1),
                   
-                  // VS Badge
                   Center(
                     child: Container(
                       margin: const EdgeInsets.symmetric(vertical: 16),
@@ -406,7 +383,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
 
                   const SizedBox(height: 32),
 
-                  // COMPARE BUTTON
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -429,7 +405,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
 
                   const SizedBox(height: 40),
 
-                  // RESULTS SECTION
                   if (hasResult && result != null)
                     _buildResultsUI()
                   else if (!isLoading)
@@ -437,7 +412,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
 
                   const SizedBox(height: 24),
                   
-                  // HISTORY LINK
                   Center(
                     child: TextButton.icon(
                       onPressed: () {
@@ -454,7 +428,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
                     ),
                   ),
 
-                  // SAVE BUTTON SECTION
                   if (hasResult && result != null) ...[
                     const SizedBox(height: 32),
                     Container(
@@ -500,12 +473,11 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
                     ),
                   ],
                   
-                  const SizedBox(height: 40), // Bottom padding
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
             
-            // Loading Overlay
             if (isLoading || loadingPlayers)
               Container(
                 color: AppColors.slate900.withOpacity(0.6),
@@ -532,8 +504,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
       ),
     );
   }
-
-  // ================= WIDGET HELPER: PLAYER CARD =================
 
   Widget _buildPlayerInputCard(int num) {
     final player = num == 1 ? player1 : player2;
@@ -663,8 +633,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     );
   }
 
-  // ================= WIDGET HELPER: RESULTS & PLACEHOLDER =================
-
   Widget _buildPlaceholderUI() {
     return Container(
       width: double.infinity,
@@ -672,7 +640,7 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
       decoration: BoxDecoration(
         color: AppColors.slate50,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.slate200, style: BorderStyle.solid), // Dashed border susah di native flutter tanpa package external
+        border: Border.all(color: AppColors.slate200, style: BorderStyle.solid),
       ),
       child: const Column(
         children: [
@@ -689,13 +657,11 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
   }
 
   Widget _buildResultsUI() {
-    // Parsing Data (Aman dari null)
     final stats1 = Map<String, dynamic>.from(result?['player1_stats'] ?? {});
     final stats2 = Map<String, dynamic>.from(result?['player2_stats'] ?? {});
     final maxValues = Map<String, dynamic>.from(result?['max_values'] ?? {});
     final bool samePosition = result?['same_position'] == true;
 
-    // Parsing Radar Data
     final radarLabels = List<String>.from(result?['radar_labels'] ?? []);
     final radarData1 = List<dynamic>.from(result?['radar_data1'] ?? []).map((e) => (e as num).toDouble()).toList();
     final radarData2 = List<dynamic>.from(result?['radar_data2'] ?? []).map((e) => (e as num).toDouble()).toList();
@@ -703,7 +669,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
 
     return Column(
       children: [
-        // 1. STATS COMPARISON
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -717,7 +682,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
             children: [
                const Text("Stats Breakdown", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.slate900)),
                const SizedBox(height: 20),
-               // Menggunakan Layout Row untuk membagi dua kolom statistik
                Row(
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
@@ -732,7 +696,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
 
         const SizedBox(height: 24),
 
-        // 2. RADAR CHART
         if (samePosition && radarLabels.isNotEmpty)
           Container(
             padding: const EdgeInsets.all(20),
@@ -794,16 +757,12 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     );
   }
 
-  // ================= HELPER FUNCTIONS =================
-
   Widget _buildStatsList(Player p, Map<String, dynamic> stats, Map<String, dynamic> maxValues, Color color) {
-    // Generate items based on position (Logic sama persis dgn sebelumnya)
     final items = _getStatsForPosition(p.position, stats, maxValues);
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header Kecil per Player
         Text(p.name, style: TextStyle(fontWeight: FontWeight.bold, color: color, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
         const SizedBox(height: 12),
         
@@ -860,7 +819,6 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
   }
 
   String _formatLabel(String raw) {
-    // Format label radar biar rapi (Goals, Assists, etc)
     return raw.replaceAll('_', ' ').split(' ').map((e) => e.isEmpty ? '' : '${e[0].toUpperCase()}${e.substring(1)}').join(' ');
   }
 
@@ -870,23 +828,22 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     if (pos == 'GK') {
       keys.addAll([
         'goals', 'assists', 'saves', 'save_percentage', 
-        'clean_sheets', 'clean_sheet_percentage' // Ditambahkan clean_sheet_percentage
+        'clean_sheets', 'clean_sheet_percentage'
       ]);
     } else if (pos == 'DF') {
       keys.addAll([
         'goals', 'assists', 'tackles', 'tackles_won', 
-        'challenges_won', 'challenges_attempted', // Ditambahkan dari flutter 1
+        'challenges_won', 'challenges_attempted',
         'blocks', 'clearances'
       ]);
     } else if (pos == 'MF') {
       keys.addAll([
         'goals', 'assists', 
-        'Progressive_Carries', 'Progressive_Passes', 'Progressive_Receptions', // Ditambahkan Carries & Receptions
-        'passes_completed', 'passes_attempted', // Ditambahkan Attempted
-        'pass_accuracy', 'xag' // Ditambahkan xag
+        'Progressive_Carries', 'Progressive_Passes', 'Progressive_Receptions',
+        'passes_completed', 'passes_attempted',
+        'pass_accuracy', 'xag'
       ]);
     } else {
-      // FW & Default
       keys.addAll(['goals', 'assists', 'xg', 'npxg', 'xag']); 
     }
 
@@ -898,17 +855,14 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
     }).toList();
   }
 
-  // ================= MODAL SAVE (FIXED PADDING & LOGIC) =================
-
   void showSaveModal() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Wajib agar bottom sheet bisa naik
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         padding: EdgeInsets.only(
           top: 24, left: 24, right: 24,
-          // Ini trik agar modal naik saat keyboard muncul
           bottom: MediaQuery.of(ctx).viewInsets.bottom + 24
         ),
         decoration: const BoxDecoration(
@@ -951,8 +905,8 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(ctx); // Tutup modal dulu
-                      saveOrUpdateComparison(); // Baru save
+                      Navigator.pop(ctx);
+                      saveOrUpdateComparison();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.slate900,
