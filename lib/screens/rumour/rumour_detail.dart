@@ -7,8 +7,6 @@ import 'package:provider/provider.dart';
 import '../../models/rumour_entry.dart';
 import 'rumour_form.dart';
 import 'rumour_list.dart';
-import '../../widgets/left_drawer.dart';
-
 
 class RumourDetailPage extends StatelessWidget {
   final RumourEntry rumour;
@@ -39,9 +37,9 @@ class RumourDetailPage extends StatelessWidget {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      drawer: const LeftDrawer(),
       appBar: AppBar(
         title: const Text('Detail Rumour'),
+        leading: const BackButton(), 
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -72,7 +70,8 @@ class RumourDetailPage extends StatelessWidget {
                 builder: (ctx) => AlertDialog(
                   title: const Text('Hapus Rumour'),
                   content: const Text(
-                      'Apakah kamu yakin ingin menghapus rumour ini?'),
+                    'Apakah kamu yakin ingin menghapus rumour ini?',
+                  ),
                   actions: [
                     TextButton(
                       child: const Text('Batal'),
@@ -91,17 +90,12 @@ class RumourDetailPage extends StatelessWidget {
               final url =
                   'https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id/transfer-rumours/${rumour.slug}/delete-flutter/';
 
-              final response = await request.postJson(
-                url,
-                jsonEncode({}), 
-              );
+              final response = await request.postJson(url, jsonEncode({}));
 
               if (context.mounted) {
                 if (response['status'] == 'success') {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Rumour berhasil dihapus'),
-                    ),
+                    const SnackBar(content: Text('Rumour berhasil dihapus')),
                   );
                   Navigator.pushAndRemoveUntil(
                     context,
@@ -114,7 +108,8 @@ class RumourDetailPage extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                          'Gagal menghapus rumour: ${response['message'] ?? ''}'),
+                        'Gagal menghapus rumour: ${response['message'] ?? ''}',
+                      ),
                     ),
                   );
                 }

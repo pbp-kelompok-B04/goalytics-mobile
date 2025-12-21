@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:goalytics_mobile/models/match_model.dart';
@@ -17,7 +18,6 @@ class MatchPredictionPage extends StatefulWidget {
 class _MatchPredictionPageState extends State<MatchPredictionPage> {
   bool _isManager = false;
 
-  // Warna tema diambil dari LeftDrawer agar konsisten
   final Color _themeColor = const Color(0xff1c2341);
 
   @override
@@ -29,7 +29,8 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
   Future<void> _fetchUserRole() async {
     final request = context.read<CookieRequest>();
     try {
-      final response = await request.get('${ApiConfig.baseUrl}/matchprediction/get-role/');
+      final response =
+          await request.get('${ApiConfig.baseUrl}/matchprediction/get-role/');
       if (mounted) {
         setState(() {
           _isManager = response['is_manager'] ?? false;
@@ -41,7 +42,8 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
   }
 
   Future<List<Match>> fetchMatches(CookieRequest request) async {
-    final response = await request.get('${ApiConfig.baseUrl}/matchprediction/json/');
+    final response =
+        await request.get('${ApiConfig.baseUrl}/matchprediction/json/');
     List<Match> listMatch = [];
     for (var d in response) {
       if (d != null) {
@@ -56,7 +58,8 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: Colors.grey[50], // Background agak abu terang biar card putih pop-up
+      backgroundColor:
+          Colors.grey[50], // Background agak abu terang biar card putih pop-up
       // 1. AppBar Transparan & Icon Hitam (Theme Color)
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -67,19 +70,20 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
 
       floatingActionButton: _isManager
           ? FloatingActionButton.extended(
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MatchFormScreen(),
-            ),
-          );
-          setState(() {}); // Refresh setelah create match
-        },
-        backgroundColor: _themeColor,
-        icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-        label: const Text("New Match", style: TextStyle(color: Colors.white)),
-      )
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MatchFormScreen(),
+                  ),
+                );
+                setState(() {}); // Refresh setelah create match
+              },
+              backgroundColor: _themeColor,
+              icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+              label: const Text("New Match",
+                  style: TextStyle(color: Colors.white)),
+            )
           : null,
 
       body: RefreshIndicator(
@@ -147,7 +151,8 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
 
                 Row(
                   children: [
-                    Icon(Icons.calendar_month_outlined, size: 20, color: _themeColor),
+                    Icon(Icons.calendar_month_outlined,
+                        size: 20, color: _themeColor),
                     const SizedBox(width: 8),
                     Text(
                       "Upcoming Games",
@@ -165,7 +170,8 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                   future: fetchMatches(request),
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: Padding(
+                      return const Center(
+                          child: Padding(
                         padding: EdgeInsets.all(50.0),
                         child: CircularProgressIndicator(),
                       ));
@@ -179,9 +185,11 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                         ),
                         child: Column(
                           children: [
-                            Icon(Icons.sports_soccer, size: 50, color: Colors.grey[300]),
+                            Icon(Icons.sports_soccer,
+                                size: 50, color: Colors.grey[300]),
                             const SizedBox(height: 10),
-                            const Text("No upcoming matches.", style: TextStyle(color: Colors.grey)),
+                            const Text("No upcoming matches.",
+                                style: TextStyle(color: Colors.grey)),
                           ],
                         ),
                       );
@@ -210,7 +218,9 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
 
   Widget _buildMatchCard(BuildContext context, Match match) {
     String rawDate = match.fields.matchDatetime.toString();
-    String date = rawDate.length > 16 ? rawDate.substring(0, 16).replaceAll('T', ' • ') : rawDate;
+    String date = rawDate.length > 16
+        ? rawDate.substring(0, 16).replaceAll('T', ' • ')
+        : rawDate;
 
     String homeTeam = match.fields.homeClubName ?? 'TBD';
     String awayTeam = match.fields.awayClubName ?? 'TBD';
@@ -251,21 +261,31 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.calendar_today, size: 12, color: Colors.grey[500]),
+                    Icon(Icons.calendar_today,
+                        size: 12, color: Colors.grey[500]),
                     const SizedBox(width: 4),
                     Text(
                       date,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(width: 10),
-                    Container(width: 1, height: 12, color: Colors.grey[300]), // Separator
+                    Container(
+                        width: 1,
+                        height: 12,
+                        color: Colors.grey[300]), // Separator
                     const SizedBox(width: 10),
                     Icon(Icons.stadium, size: 12, color: Colors.grey[500]),
                     const SizedBox(width: 4),
                     Flexible(
                       child: Text(
                         match.fields.venue,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -298,7 +318,8 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(20),

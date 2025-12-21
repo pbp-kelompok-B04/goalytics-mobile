@@ -3,10 +3,9 @@ import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/models/forum_models.dart';
 import 'package:goalytics_mobile/service/forum_service.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_action_sheet.dart';
-import 'package:goalytics_mobile/widgets/Forum/post/post_back_button.dart';
+
 import 'package:goalytics_mobile/widgets/Forum/post/post_card.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_discussion_section.dart';
-import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -16,12 +15,10 @@ class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({
     super.key,
     required this.postId,
-    this.withSidebar = true,
     this.username = 'GoalyticsUser',
   });
 
   final int postId;
-  final bool withSidebar;
   final String username;
 
   @override
@@ -217,7 +214,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const PostBackButton(),
               const SizedBox(height: 16),
               _buildPlaceholderPanel(
                 child: Column(
@@ -281,8 +277,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const PostBackButton(),
-              const SizedBox(height: 16),
               _buildPlaceholderPanel(
                 child: const Center(
                   child: Text(
@@ -327,8 +321,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const PostBackButton(),
-              const SizedBox(height: 16),
               PostCard(
                 post: _post!,
                 onToggleLike: _togglePostLike,
@@ -417,22 +409,23 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     );
   }
 
-void _confirmDelete(ForumComment comment) {
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent,
-    builder: (ctx) {
-      return GenericDeleteSheet(
-        title: 'Delete Comment', 
-        description: 'Are you sure you want to delete this comment? It will be gone forever.',
-        onConfirm: () {
-          Navigator.of(ctx).pop();
-          _deleteComment(comment); 
-        },
-      );
-    },
-  );
-}
+  void _confirmDelete(ForumComment comment) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return GenericDeleteSheet(
+          title: 'Delete Comment',
+          description:
+              'Are you sure you want to delete this comment? It will be gone forever.',
+          onConfirm: () {
+            Navigator.of(ctx).pop();
+            _deleteComment(comment);
+          },
+        );
+      },
+    );
+  }
 
   void _showToast(String message, {bool isError = false}) {
     if (!mounted) return;
@@ -447,40 +440,27 @@ void _confirmDelete(ForumComment comment) {
 
   @override
   Widget build(BuildContext context) {
-    final page = SafeArea(
-      child: Container(
-        color: const Color(0xFFF8FAFC),
-        child: _loading
-            ? _buildLoadingLayout()
-            : _post == null
-                ? _buildErrorLayout()
-                : _buildLoadedLayout(),
-      ),
-    );
-
-    if (!widget.withSidebar) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF475569)),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
-        body: page,
-        bottomNavigationBar: const BottomNav(),
-      );
-    }
-
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFC),
-        foregroundColor: Colors.black,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF475569)),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      drawer: const LeftDrawer(),
-      body: page,
+      body: SafeArea(
+        child: Container(
+          color: Colors.white,
+          child: _loading
+              ? _buildLoadingLayout()
+              : _post == null
+                  ? _buildErrorLayout()
+                  : _buildLoadedLayout(),
+        ),
+      ),
+      bottomNavigationBar: const BottomNav(),
     );
   }
 }
