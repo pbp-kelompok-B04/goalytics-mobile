@@ -41,21 +41,19 @@ jobs:
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --split-per-abi
+        run: flutter build apk --release
 
       - name: Decode Keystore
         run: echo "${{ secrets.KEY_JKS }}" | base64 -d > release-keystore.jks
 
       - name: Sign APKs
         run: |
-          for apk in build/app/outputs/flutter-apk/*.apk; do
-            echo "Signing $apk..."
-            jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-              -keystore release-keystore.jks \
-              -storepass "${{ secrets.KEY_PASSWORD }}" \
-              -keypass "${{ secrets.KEY_PASSWORD }}" \
-              "$apk" release
-          done
+          $ANDROID_HOME/build-tools/34.0.0/apksigner sign \
+          --ks release-keystore.jks \
+          --ks-key-alias release \
+          --ks-pass pass:${{ secrets.KEY_PASSWORD }} \
+          --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+          build/app/outputs/flutter-apk/*.apk
 
       - name: Cleanup Keystore
         if: always()
