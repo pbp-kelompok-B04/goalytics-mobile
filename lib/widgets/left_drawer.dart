@@ -7,6 +7,10 @@ import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
 // 👇 PERBAIKAN IMPORT: Mengarah ke nama file yang benar di repo Anda
 import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
+import 'package:goalytics_mobile/screens/login.dart';
+import 'package:goalytics_mobile/service/api_config.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -57,8 +61,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                  const MyHomePage(title: "Dashboard"),
+                  builder: (context) => const MyHomePage(title: "Dashboard"),
                 ),
               );
             },
@@ -161,8 +164,33 @@ class LeftDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.logout,
             title: "Logout",
-            onTap: () {
-              // TODO: logout logic
+            onTap: () async {
+              final request = context.read<CookieRequest>();
+              final response = await request.logout(
+                "${ApiConfig.baseUrl}/auth/logout/",
+              );
+              if (context.mounted) {
+                if (response['status'] == true) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          response['message'] ?? 'Logged out successfully!'),
+                      backgroundColor: const Color(0xFF0F172A),
+                    ),
+                  );
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(response['message'] ?? 'Logout failed.'),
+                      backgroundColor: const Color(0xFFEF4444),
+                    ),
+                  );
+                }
+              }
             },
           ),
         ],
