@@ -13,6 +13,7 @@ class ProfileEntry {
   String xUrl;
   String websiteUrl;
   String role;
+  String memberSince;
 
   ProfileEntry({
     required this.username,
@@ -28,6 +29,7 @@ class ProfileEntry {
     required this.xUrl,
     required this.websiteUrl,
     required this.role,
+    required this.memberSince,
   });
 
   factory ProfileEntry.fromJson(Map<String, dynamic> json) {
@@ -44,7 +46,9 @@ class ProfileEntry {
       instagramUrl: json['instagram_url'] ?? '',
       xUrl: json['x_url'] ?? '',
       websiteUrl: json['website_url'] ?? '',
-      role: json['role'] ?? '',
+      role: (json["role"] ?? "").toString(),
+      memberSince: (json["member_since"]),
+
     );
   }
 
@@ -57,7 +61,7 @@ class ProfileEntry {
       "instagram_url": instagramUrl,
       "x_url": xUrl,
       "website_url": websiteUrl,
-      "favorite_team": favoriteTeam,
+      "favorite_team_id": favoriteTeamId,
     };
   }
 }
