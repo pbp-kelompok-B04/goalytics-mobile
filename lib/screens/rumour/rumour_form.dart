@@ -5,7 +5,6 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/rumour_entry.dart';
-import '../../widgets/left_drawer.dart';
 
 class RumourFormPage extends StatefulWidget {
   final RumourEntry? existingRumour;
@@ -70,7 +69,8 @@ class _RumourFormPageState extends State<RumourFormPage> {
       'cover_image_url': _coverImageUrlController.text.trim(),
     };
 
-    final baseUrl = 'https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id/transfer-rumours';
+    final baseUrl =
+        'https://jefferson-tirza-goalytics.pbp.cs.ui.ac.id/transfer-rumours';
 
     final url = isEdit
         ? '$baseUrl/${widget.existingRumour!.slug}/update-flutter/'
@@ -92,9 +92,9 @@ class _RumourFormPageState extends State<RumourFormPage> {
       Navigator.pop(context, true);
     } else {
       final msg = response['message'] ?? 'Terjadi kesalahan.';
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Gagal menyimpan rumour: $msg')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menyimpan rumour: $msg')),
+      );
     }
   }
 
@@ -103,8 +103,10 @@ class _RumourFormPageState extends State<RumourFormPage> {
     final titleText = isEdit ? 'Edit Rumour' : 'Tambah Rumour';
 
     return Scaffold(
-      drawer: const LeftDrawer(),
-      appBar: AppBar(title: Text(titleText)),
+      appBar: AppBar(
+        title: Text(titleText),
+        leading: const BackButton(),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Card(
@@ -184,9 +186,7 @@ class _RumourFormPageState extends State<RumourFormPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () => _submit(context),
-                      child: Text(
-                        isEdit ? 'Simpan Perubahan' : 'Tambah Rumour',
-                      ),
+                      child: Text(isEdit ? 'Simpan Perubahan' : 'Tambah Rumour'),
                     ),
                   ),
                 ],
