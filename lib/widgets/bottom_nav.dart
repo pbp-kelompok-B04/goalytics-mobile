@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/menu.dart';
 import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
+import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
+import 'package:goalytics_mobile/screens/dream_squad/dream_squad.dart';
 import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
 import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
@@ -14,8 +16,7 @@ class BottomNav extends StatelessWidget {
     final route = ModalRoute.of(context);
     if (route == null) return 0;
 
-    final String? routeName = route.settings.name;
-
+    // Periksa widget ancestor untuk menentukan tab mana yang aktif
     if (context.findAncestorWidgetOfExactType<MyHomePage>() != null) return 0;
     if (context.findAncestorWidgetOfExactType<MyProfilePage>() != null) return 1;
     if (context.findAncestorWidgetOfExactType<MatchPredictionPage>() != null) return 2;
@@ -23,6 +24,8 @@ class BottomNav extends StatelessWidget {
     if (context.findAncestorWidgetOfExactType<PostDetailScreen>() != null) return 3;
     if (context.findAncestorWidgetOfExactType<ComparisonScreen>() != null) return 4;
     if (context.findAncestorWidgetOfExactType<RumourListPage>() != null) return 5;
+    // Tambahkan pengecekan untuk DreamSquadPage
+    if (context.findAncestorWidgetOfExactType<DreamSquadPage>() != null) return 6;
 
     return 0;
   }
@@ -50,6 +53,10 @@ class BottomNav extends StatelessWidget {
       case 5:
         nextScreen = const RumourListPage();
         break;
+    // Tambahkan case untuk Dream Squad
+      case 6:
+        nextScreen = const DreamSquadPage();
+        break;
       default:
         nextScreen = const MyHomePage(title: "Dashboard");
     }
@@ -71,9 +78,11 @@ class BottomNav extends StatelessWidget {
       onTap: (index) => _onItemTapped(index, context),
       selectedItemColor: Colors.blueAccent,
       unselectedItemColor: Colors.grey,
+      // Ubah ke Shifting jika item lebih dari 5 agar tampilan tidak terlalu rapat,
+      // atau tetap Fixed jika ingin semua label terlihat.
       type: BottomNavigationBarType.fixed,
-      selectedFontSize: 12,
-      unselectedFontSize: 12,
+      selectedFontSize: 10, // Perkecil sedikit font karena item bertambah
+      unselectedFontSize: 10,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard_outlined),
@@ -104,6 +113,12 @@ class BottomNav extends StatelessWidget {
           icon: Icon(Icons.swap_horiz),
           activeIcon: Icon(Icons.swap_horiz),
           label: "Rumours",
+        ),
+        // Tambahkan item Dream Squad di paling akhir
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite_border),
+          activeIcon: Icon(Icons.favorite),
+          label: "Squad",
         ),
       ],
     );
