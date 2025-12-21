@@ -6,7 +6,6 @@ import 'package:goalytics_mobile/widgets/Forum/post/post_action_sheet.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_back_button.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_card.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_discussion_section.dart';
-import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -16,12 +15,10 @@ class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({
     super.key,
     required this.postId,
-    this.withSidebar = true,
     this.username = 'GoalyticsUser',
   });
 
   final int postId;
-  final bool withSidebar;
   final String username;
 
   @override
@@ -447,41 +444,27 @@ void _confirmDelete(ForumComment comment) {
 
   @override
   Widget build(BuildContext context) {
-    final page = SafeArea(
-      child: Container(
-        color: Colors.white,
-        child: _loading
-            ? _buildLoadingLayout()
-            : _post == null
-                ? _buildErrorLayout()
-                : _buildLoadedLayout(),
-      ),
-    );
-
-    if (!widget.withSidebar) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF475569)),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
-        body: page,
-        bottomNavigationBar: const BottomNav(),
-      );
-    }
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF475569)),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      drawer: const LeftDrawer(),
-      body: page,
+      body: SafeArea(
+        child: Container(
+          color: Colors.white,
+          child: _loading
+              ? _buildLoadingLayout()
+              : _post == null
+                  ? _buildErrorLayout()
+                  : _buildLoadedLayout(),
+        ),
+      ),
+      bottomNavigationBar: const BottomNav(),
     );
   }
 }
