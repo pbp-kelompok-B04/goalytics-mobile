@@ -6,7 +6,7 @@ import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
 import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
-import 'package:goalytics_mobile/screens/favorite_player/favorite_players.dart';
+import 'package:goalytics_mobile/screens/dream_squad/dream_squad.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_prediction.dart';
 import 'package:goalytics_mobile/screens/discussion/forum_home_screen.dart';
 
@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (index) {
       case 1:
         Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const FavoritePlayersPage()));
+            MaterialPageRoute(builder: (_) => const DreamSquadPage()));
         break;
       case 2:
         Navigator.push(context,
@@ -166,8 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   const SizedBox(height: 12),
 
                   _featureCard(
-                    title: "Favorite Players",
-                    description: "Save and track your favorite football stars.",
+                    title: "Dream Squad",
+                    description: "Save and manage your dream squad.",
                     icon: Icons.favorite,
                   ),
                   _featureCard(
@@ -263,9 +263,9 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (title == "Find Users") {
           Navigator.push(context,
               MaterialPageRoute(builder: (_) => const ExploreProfilesPage()));
-        } else if (title == "Favorite Players") {
+        } else if (title == "Dream Squad") {
           Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const FavoritePlayersPage()));
+              MaterialPageRoute(builder: (_) => const DreamSquadPage()));
         } else if (title == "Match Prediction") {
           Navigator.push(context,
               MaterialPageRoute(builder: (_) => const MatchPredictionPage()));

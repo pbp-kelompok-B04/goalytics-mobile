@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/menu.dart';
 import 'package:goalytics_mobile/screens/comparison/comparison_screen.dart';
+import 'package:goalytics_mobile/screens/dream_squad/dream_squad.dart';
 import 'package:goalytics_mobile/screens/rumour/rumour_list.dart';
 import 'package:goalytics_mobile/screens/profile/my_profile_page.dart';
 import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
@@ -92,8 +93,16 @@ class LeftDrawer extends StatelessWidget {
 
           _drawerItem(
             icon: Icons.favorite,
-            title: "Favorite Players",
-            onTap: () {},
+            title: "Dream Squad",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // 👇 HAPUS const DI SINI
+                  builder: (context) => DreamSquadPage(),
+                ),
+              );
+            },
           ),
 
           _drawerItem(
