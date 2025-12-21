@@ -3,6 +3,7 @@ import 'package:goalytics_mobile/models/forum_models.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_helpers.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_like_button.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_media_preview.dart';
+import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({
@@ -42,7 +43,11 @@ class PostCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildPostAvatar(post.author, post.avatar, size: 48),
+              profileAvatar(
+                imageUrl: post.avatar ?? '',
+                fallbackText: post.author,
+                radius: 18,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -84,13 +89,6 @@ class PostCard extends StatelessWidget {
                           style: TextStyle(color: Color(0xFFCBD5E1)),
                         ),
                         const SizedBox(width: 6),
-                        Text(
-                          postTimeAgo(post.createdAt),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF94A3B8),
-                          ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -98,6 +96,14 @@ class PostCard extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 1),
+          Text(
+            postTimeAgo(post.createdAt),
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF94A3B8),
+            ),
           ),
           const SizedBox(height: 10),
           Text(

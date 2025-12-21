@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class GenericDeleteSheet extends StatelessWidget {
   const GenericDeleteSheet({
     super.key,
-    // Hapus default value, jadikan required agar pemanggil wajib menentukan konteksnya
     required this.title, 
     required this.description,
     required this.onConfirm,
@@ -17,7 +16,6 @@ class GenericDeleteSheet extends StatelessWidget {
   final String confirmLabel;
   final String cancelLabel;
 
-  // Palet Warna Tailwind
   static const Color slate200 = Color(0xFFE2E8F0);
   static const Color slate500 = Color(0xFF64748B);
   static const Color slate600 = Color(0xFF475569);
