@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// --- Model Result (Tetap sama) ---
 class ForumEditorResult {
   ForumEditorResult({
     required this.title,
@@ -17,7 +16,6 @@ class ForumEditorResult {
   final String? attachmentUrl;
 }
 
-// --- Main Widget ---
 class ForumEditorSheet extends StatefulWidget {
   const ForumEditorSheet({
     super.key,
@@ -45,7 +43,6 @@ class _ForumEditorSheetState extends State<ForumEditorSheet> {
   late final TextEditingController _attachmentCtrl;
   late String _league;
 
-  // Palet Warna Tailwind Slate (Approximation)
   static const Color slate50 = Color(0xFFF8FAFC);
   static const Color slate100 = Color(0xFFF1F5F9);
   static const Color slate200 = Color(0xFFE2E8F0);
@@ -75,7 +72,6 @@ class _ForumEditorSheetState extends State<ForumEditorSheet> {
 
   void _onSubmit() {
     if (_titleCtrl.text.trim().isEmpty || _contentCtrl.text.trim().isEmpty) {
-      // Validasi sederhana, bisa tambah snackbar error disini
       return;
     }
     Navigator.of(context).pop(
@@ -94,19 +90,19 @@ class _ForumEditorSheetState extends State<ForumEditorSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // Menangani keyboard overlap
+    
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final isEditing = widget.initialTitle.isNotEmpty;
 
     return Container(
-      // Batasi tinggi maksimal agar tidak memenuhi layar penuh
+      
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)), // rounded-3xl
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)), 
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -123,12 +119,12 @@ class _ForumEditorSheetState extends State<ForumEditorSheet> {
                 Text(
                   isEditing ? 'Edit Post' : 'Create New Post',
                   style: const TextStyle(
-                    fontSize: 20, // text-xl
-                    fontWeight: FontWeight.w600, // font-semibold
+                    fontSize: 20, 
+                    fontWeight: FontWeight.w600, 
                     color: slate900,
                   ),
                 ),
-                // Tombol Close Bulat (Tailwind: rounded-full bg-slate-100 p-2)
+              
                 InkWell(
                   onTap: () => Navigator.of(context).pop(),
                   borderRadius: BorderRadius.circular(50),
