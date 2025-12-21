@@ -58,11 +58,14 @@ class PostCommentTile extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          comment.user,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF0F172A),
+                        Flexible(
+                          child: Text(
+                            comment.user,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF0F172A),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 6),

@@ -3,7 +3,7 @@ import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/models/forum_models.dart';
 import 'package:goalytics_mobile/service/forum_service.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_action_sheet.dart';
-import 'package:goalytics_mobile/widgets/Forum/post/post_back_button.dart';
+
 import 'package:goalytics_mobile/widgets/Forum/post/post_card.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_discussion_section.dart';
 import 'package:goalytics_mobile/widgets/bottom_nav.dart';
@@ -214,7 +214,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const PostBackButton(),
               const SizedBox(height: 16),
               _buildPlaceholderPanel(
                 child: Column(
@@ -278,8 +277,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const PostBackButton(),
-              const SizedBox(height: 16),
               _buildPlaceholderPanel(
                 child: const Center(
                   child: Text(
@@ -324,8 +321,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const PostBackButton(),
-              const SizedBox(height: 16),
               PostCard(
                 post: _post!,
                 onToggleLike: _togglePostLike,
@@ -414,22 +409,23 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     );
   }
 
-void _confirmDelete(ForumComment comment) {
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent,
-    builder: (ctx) {
-      return GenericDeleteSheet(
-        title: 'Delete Comment', 
-        description: 'Are you sure you want to delete this comment? It will be gone forever.',
-        onConfirm: () {
-          Navigator.of(ctx).pop();
-          _deleteComment(comment); 
-        },
-      );
-    },
-  );
-}
+  void _confirmDelete(ForumComment comment) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return GenericDeleteSheet(
+          title: 'Delete Comment',
+          description:
+              'Are you sure you want to delete this comment? It will be gone forever.',
+          onConfirm: () {
+            Navigator.of(ctx).pop();
+            _deleteComment(comment);
+          },
+        );
+      },
+    );
+  }
 
   void _showToast(String message, {bool isError = false}) {
     if (!mounted) return;
