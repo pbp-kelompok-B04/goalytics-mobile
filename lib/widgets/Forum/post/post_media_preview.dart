@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 String? _extractYouTubeId(String url) {
+  final videoId = YoutubePlayerController.convertUrlToId(url);
+  if (videoId != null) return videoId;
   try {
     final uri = Uri.parse(url);
     if (uri.host.contains('youtu.be')) {
@@ -41,34 +44,7 @@ class PostMediaPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final ytId = _extractYouTubeId(url);
     if (ytId != null) {
-      final thumb = 'https://img.youtube.com/vi/$ytId/0.jpg';
-      return Stack(
-        alignment: Alignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: Image.network(
-              thumb,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 200,
-              errorBuilder: (_, __, ___) => PostMediaFallback(url: url),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
-              shape: BoxShape.circle,
-            ),
-            padding: const EdgeInsets.all(16),
-            child: const Icon(
-              Icons.play_arrow_rounded,
-              color: Colors.white,
-              size: 40,
-            ),
-          ),
-        ],
-      );
+      return YouTubeVideoPlayer(videoId: ytId, url: url);
     }
 
     final lower = url.toLowerCase();
@@ -90,6 +66,56 @@ class PostMediaPreview extends StatelessWidget {
       );
     }
     return PostMediaFallback(url: url);
+  }
+}
+
+class YouTubeVideoPlayer extends StatefulWidget {
+  const YouTubeVideoPlayer({
+    super.key,
+    required this.videoId,
+    required this.url,
+  });
+
+  final String videoId;
+  final String url;
+
+  @override
+  State<YouTubeVideoPlayer> createState() => _YouTubeVideoPlayerState();
+}
+
+class _YouTubeVideoPlayerState extends State<YouTubeVideoPlayer> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController.fromVideoId(
+      videoId: widget.videoId,
+      autoPlay: false,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        mute: false,
+        showFullscreenButton: true,
+        loop: false,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: YoutubePlayer(
+        controller: _controller,
+        aspectRatio: 16 / 9,
+      ),
+    );
   }
 }
 
