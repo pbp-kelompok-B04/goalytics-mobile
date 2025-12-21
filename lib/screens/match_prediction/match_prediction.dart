@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:goalytics_mobile/models/match_model.dart';
-import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_detail_screen.dart';
 import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_form_screen.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 
 class MatchPredictionPage extends StatefulWidget {
   const MatchPredictionPage({super.key});
@@ -61,13 +61,10 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: _themeColor),
-        // Title dihilangkan dari sini, dipindah ke body
+        automaticallyImplyLeading: false,
       ),
-      drawer: const LeftDrawer(),
+      bottomNavigationBar: const BottomNav(),
 
-      // 3. FAB Custom (Extended & Theme Color)
-      // Logika Role Based: Hanya muncul jika _isManager == true
       floatingActionButton: _isManager
           ? FloatingActionButton.extended(
         onPressed: () async {
@@ -98,23 +95,54 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
               children: [
                 // 1. Header Section (Typography Modern)
                 const SizedBox(height: 10),
-                Text(
-                  "Football Match\nPrediction",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    color: _themeColor,
-                    height: 1.1, // Line height agak rapat
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  "Predict the score, beat the odds, and rule the leaderboard! Show them you're a true fan.",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    height: 1.5,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Bagian Teks (Kiri)
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Football Match\nPrediction",
+                            style: TextStyle(
+                              fontSize: 28, // Sedikit disesuaikan agar muat
+                              fontWeight: FontWeight.w800,
+                              color: _themeColor,
+                              height: 1.1,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Predict the score, beat the odds, and rule the leaderboard!",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Bagian Visual/Icon (Kanan)
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: _themeColor.withOpacity(0.1), // Background kotak tipis
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Icon(
+                          Icons.insights, // Icon grafik/prediksi
+                          size: 40,
+                          color: _themeColor,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 30),

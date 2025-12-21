@@ -140,47 +140,77 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          // Admin Actions (Edit/Delete Match)
-          if (_isManager) ...[
-            IconButton(
-              icon: const Icon(Icons.edit, color: Colors.white),
-              tooltip: "Edit Match",
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MatchFormScreen(match: widget.match),
-                  ),
-                );
-                if (result == true && context.mounted) {
-                  Navigator.pop(context, true);
-                }
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.redAccent),
-              tooltip: "Delete Match",
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text("Delete Match"),
-                    content: const Text("Are you sure? This cannot be undone."),
-                    actions: [
-                      TextButton(child: const Text("Cancel"), onPressed: () => Navigator.pop(ctx)),
-                      TextButton(
-                        child: const Text("Delete", style: TextStyle(color: Colors.red)),
-                        onPressed: () {
-                          Navigator.pop(ctx);
-                          _deleteMatch(request);
-                        },
+          // Admin Actions (Menu Titik Tiga Premium)
+          if (_isManager)
+            Theme(
+              data: Theme.of(context).copyWith(
+                popupMenuTheme: PopupMenuThemeData(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              child: PopupMenuButton<String>(
+                icon: const Icon(Icons.more_horiz, color: Colors.white, size: 28),
+                onSelected: (String value) async {
+                  if (value == 'edit') {
+                    // Logika Edit
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MatchFormScreen(match: widget.match),
                       ),
-                    ],
+                    );
+                    if (result == true && context.mounted) {
+                      Navigator.pop(context, true);
+                    }
+                  } else if (value == 'delete') {
+                    // Logika Delete (dengan dialog konfirmasi yang sudah ada)
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text("Delete Match"),
+                        content: const Text("Are you sure? This cannot be undone."),
+                        actions: [
+                          TextButton(child: const Text("Cancel"), onPressed: () => Navigator.pop(ctx)),
+                          TextButton(
+                            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                            onPressed: () {
+                              Navigator.pop(ctx);
+                              _deleteMatch(request);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit_outlined, color: Colors.black87, size: 20),
+                        SizedBox(width: 12),
+                        Text('Edit Match'),
+                      ],
+                    ),
                   ),
-                );
-              },
+                  const PopupMenuDivider(), // Garis pemisah tipis
+                  const PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                        SizedBox(width: 12),
+                        Text('Delete Match', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ]
+
+          const SizedBox(width: 8), // Sedikit jarak dari kanan layar
         ],
       ),
       body: SingleChildScrollView(
