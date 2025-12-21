@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goalytics_mobile/models/forum_models.dart';
+import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_helpers.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_like_button.dart';
 import 'package:goalytics_mobile/widgets/Forum/post/post_media_preview.dart';
@@ -56,18 +57,22 @@ class ForumListCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. AVATAR SECTION
+                
                 Padding(
                   padding: const EdgeInsets.only(right: 16.0),
-                  child: buildPostAvatar(post.author, post.avatar, size: 48),
+                  child: profileAvatar(
+                    imageUrl: post.avatar ?? '',
+                    fallbackText: post.author,
+                    radius: 24,
+                  ),
                 ),
-                // 2. CONTENT SECTION
+                
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        // Padding kanan ekstra agar teks tidak tertutup tombol Edit/Delete
+                        
                         padding: EdgeInsets.only(
                           right: (post.isAuthor && (onEdit != null || onDelete != null)) 
                               ? 64.0 
@@ -75,20 +80,20 @@ class ForumListCard extends StatelessWidget {
                         ),
                         child: Wrap(
                           crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 8,    // Jarak horizontal (gap-2)
-                          runSpacing: 4, // Jarak vertikal jika turun baris
+                          spacing: 8,    
+                          runSpacing: 4, 
                           children: [
-                            // Judul
+                            
                             Text(
                               post.title,
                               style: const TextStyle(
-                                fontSize: 17, // text-lg ~ xl
-                                fontWeight: FontWeight.w700, // font-semibold
+                                fontSize: 17, 
+                                fontWeight: FontWeight.w700,
                                 color: slate900,
                                 height: 1.2,
                               ),
                             ),
-                            // League Badge (Chip)
+                           
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -96,14 +101,14 @@ class ForumListCard extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: slate50,
-                                borderRadius: BorderRadius.circular(100), // rounded-full
+                                borderRadius: BorderRadius.circular(100), 
                                 border: Border.all(color: slate200),
                               ),
                               child: Text(
                                 postLeagueLabel(post.league),
                                 style: const TextStyle(
-                                  fontSize: 11, // text-xs
-                                  fontWeight: FontWeight.w600, // font-medium
+                                  fontSize: 11, 
+                                  fontWeight: FontWeight.w600, 
                                   color: slate600,
                                 ),
                               ),
@@ -126,16 +131,16 @@ class ForumListCard extends StatelessWidget {
                         ),
                       ],
 
-                      // TEXT CONTENT
+                      
                       const SizedBox(height: 8),
                       Text(
                         post.content,
-                        maxLines: 3, // truncate-lines-3
+                        maxLines: 3, 
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 14, // text-sm
+                          fontSize: 14, 
                           color: slate600,
-                          height: 1.5, // leading-relaxed
+                          height: 1.5, 
                         ),
                       ),
 

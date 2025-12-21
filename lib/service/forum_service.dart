@@ -21,7 +21,9 @@ class ForumService {
         Uri.parse('$baseUrl/forum/api/posts/').replace(queryParameters: params);
     final resp = await request.get(uri.toString());
     final list = (resp['data'] as List<dynamic>? ?? []);
-    return list.map((e) => ForumPost.fromJson(e as Map<String, dynamic>)).toList();
+    return list
+        .map((e) => ForumPost.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<ForumPost> getPost(int id) async {
@@ -30,9 +32,12 @@ class ForumService {
   }
 
   Future<List<ForumComment>> getComments(int postId) async {
-    final resp = await request.get('$baseUrl/forum/api/posts/$postId/comments/');
+    final resp =
+        await request.get('$baseUrl/forum/api/posts/$postId/comments/');
     final list = (resp['data'] as List<dynamic>? ?? []);
-    return list.map((e) => ForumComment.fromJson(e as Map<String, dynamic>)).toList();
+    return list
+        .map((e) => ForumComment.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<ForumPost> createPost({

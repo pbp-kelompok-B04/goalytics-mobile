@@ -6,7 +6,7 @@ import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/models/match_model.dart';
 
 class MatchFormScreen extends StatefulWidget {
-  final Match? match; // Jika null = Create, Jika ada = Edit
+  final Match? match;
 
   const MatchFormScreen({super.key, this.match});
 
@@ -17,13 +17,13 @@ class MatchFormScreen extends StatefulWidget {
 class _MatchFormScreenState extends State<MatchFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Variabel Form
+  final Color _themeColor = const Color(0xff1c2341);
+
   String? _selectedHomeClub;
   String? _selectedAwayClub;
   DateTime _selectedDate = DateTime.now();
   final TextEditingController _venueController = TextEditingController();
 
-  // Data Klub dari Backend
   List<dynamic> _clubs = [];
   bool _isLoading = true;
 
@@ -32,13 +32,9 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
     super.initState();
     _fetchClubs();
 
-    // Jika Edit Mode, isi form dengan data lama
     if (widget.match != null) {
       _venueController.text = widget.match!.fields.venue;
       _selectedDate = widget.match!.fields.matchDatetime;
-      // Note: Mengisi dropdown club agak tricky karena kita butuh ID,
-      // tapi model Match kita mungkin cuma menyimpan ID (integer).
-      // Kita set nanti setelah fetch clubs selesai.
     }
   }
 
@@ -47,13 +43,10 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
     try {
       final response = await request.get('${ApiConfig.baseUrl}/matchprediction/get-clubs/');
       setState(() {
-        _clubs = response; // List of {id: 1, name: "Arsenal"}
+        _clubs = response;
         _isLoading = false;
 
-        // Set initial values for Dropdown if Edit Mode
         if (widget.match != null) {
-          // Cari ID klub di list dan set sebagai selected
-          // (Asumsi widget.match.fields.homeClub adalah int ID)
           if (widget.match!.fields.homeClub != null) {
             _selectedHomeClub = widget.match!.fields.homeClub.toString();
           }
@@ -73,6 +66,18 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: _themeColor,
+              onPrimary: Colors.white,
+              onSurface: _themeColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -83,51 +88,53 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
+    final request = context.read<CookieRequest>();
     final isEdit = widget.match != null;
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(isEdit ? "Edit Match" : "Create Match"),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new, color: _themeColor),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: _themeColor))
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- HOME CLUB ---
-              const Text("Home Club", style: TextStyle(fontWeight: FontWeight.bold)),
-              DropdownButtonFormField<String>(
+              // Header Title
+              Text(
+                isEdit ? "Edit Match" : "Create\nNew Match",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w800,
+                  color: _themeColor,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              _buildLabel("Home Club"),
+              _buildDropdownField(
+                hint: "Select Home Club",
                 value: _selectedHomeClub,
-                hint: const Text("Select Home Club"),
-                items: _clubs.map<DropdownMenuItem<String>>((club) {
-                  return DropdownMenuItem<String>(
-                    value: club['id'].toString(),
-                    child: Text(club['name']),
-                  );
-                }).toList(),
                 onChanged: (val) => setState(() => _selectedHomeClub = val),
                 validator: (val) => val == null ? "Required" : null,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // --- AWAY CLUB ---
-              const Text("Away Club", style: TextStyle(fontWeight: FontWeight.bold)),
-              DropdownButtonFormField<String>(
+              _buildLabel("Away Club"),
+              _buildDropdownField(
+                hint: "Select Away Club",
                 value: _selectedAwayClub,
-                hint: const Text("Select Away Club"),
-                items: _clubs.map<DropdownMenuItem<String>>((club) {
-                  return DropdownMenuItem<String>(
-                    value: club['id'].toString(),
-                    child: Text(club['name']),
-                  );
-                }).toList(),
                 onChanged: (val) => setState(() => _selectedAwayClub = val),
                 validator: (val) {
                   if (val == null) return "Required";
@@ -135,42 +142,81 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // --- DATE PICKER ---
-              const Text("Match Date", style: TextStyle(fontWeight: FontWeight.bold)),
-              ListTile(
-                title: Text("${_selectedDate.toLocal()}".split(' ')[0]),
-                trailing: const Icon(Icons.calendar_today),
-                contentPadding: EdgeInsets.zero,
+              _buildLabel("Match Date"),
+              GestureDetector(
                 onTap: () => _selectDate(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_month_outlined, color: _themeColor),
+                      const SizedBox(width: 12),
+                      Text(
+                        "${_selectedDate.toLocal()}".split(' ')[0],
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[400]),
+                    ],
+                  ),
+                ),
               ),
-              const Divider(),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // --- VENUE ---
+              _buildLabel("Venue (Stadium)"),
               TextFormField(
                 controller: _venueController,
-                decoration: const InputDecoration(
-                  labelText: "Venue (Stadium)",
-                  border: OutlineInputBorder(),
+                style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+                decoration: InputDecoration(
+                  hintText: "e.g. Emirates Stadium",
+                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: _themeColor, width: 2),
+                  ),
                 ),
                 validator: (val) => val!.isEmpty ? "Required" : null,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 40),
 
               // --- SUBMIT BUTTON ---
               SizedBox(
                 width: double.infinity,
+                height: 56,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.indigo,
+                    backgroundColor: _themeColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 2,
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Tentukan URL: Create atau Edit
                       String url = isEdit
                           ? "${ApiConfig.baseUrl}/matchprediction/edit-match-flutter/${widget.match!.pk}/"
                           : "${ApiConfig.baseUrl}/matchprediction/create-match-flutter/";
@@ -189,24 +235,86 @@ class _MatchFormScreenState extends State<MatchFormScreen> {
                         if (response['status'] == 'success') {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                             content: Text("Match saved successfully!"),
+                            behavior: SnackBarBehavior.floating,
                           ));
-                          Navigator.pop(context, true); // Balik dan refresh
+                          Navigator.pop(context, true);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text(response['message'] ?? "Error"),
                             backgroundColor: Colors.red,
+                            behavior: SnackBarBehavior.floating,
                           ));
                         }
                       }
                     }
                   },
-                  child: Text(isEdit ? "Update Match" : "Create Match"),
+                  child: Text(
+                    isEdit ? "Update Match" : "Create Match",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
+              const SizedBox(height: 40),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: _themeColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String hint,
+    required String? value,
+    required Function(String?) onChanged,
+    required String? Function(String?) validator,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      hint: Text(hint, style: TextStyle(color: Colors.grey[400])),
+      items: _clubs.map<DropdownMenuItem<String>>((club) {
+        return DropdownMenuItem<String>(
+          value: club['id'].toString(),
+          child: Text(club['name'], style: TextStyle(color: Colors.grey[800])),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      validator: validator,
+      icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: _themeColor, width: 2),
+        ),
+      ),
+      dropdownColor: Colors.white,
     );
   }
 }

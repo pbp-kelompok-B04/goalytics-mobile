@@ -5,7 +5,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:goalytics_mobile/service/dream_squad_service.dart';
 import 'package:goalytics_mobile/models/dream_squad_models.dart';
-import 'package:goalytics_mobile/widgets/left_drawer.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/screens/dream_squad/squad_detail.dart';
 import 'package:goalytics_mobile/screens/dream_squad/edit_squad.dart';
@@ -233,6 +233,7 @@ class _DreamSquadPageState extends State<DreamSquadPage> {
     return Scaffold(
       backgroundColor: AppColors.slate50,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Dream Squads',
           style: TextStyle(color: AppColors.slate900, fontWeight: FontWeight.bold),
@@ -242,11 +243,8 @@ class _DreamSquadPageState extends State<DreamSquadPage> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: AppColors.slate900),
       ),
-      drawer: const LeftDrawer(),
       body: Stack(
         children: [
-          // IMPORTANT: jangan masukkan _searchController.text ke future
-          // karena itu akan membuat FutureBuilder memanggil ulang setiap ketikan.
           FutureBuilder<SquadModel>(
             future: _initialFuture,  // <- fixed: tanpa query argumen
             builder: (context, snapshot) {
@@ -306,7 +304,7 @@ class _DreamSquadPageState extends State<DreamSquadPage> {
                         _buildBannedWordsSection(squadModel.adminExtras.bannedWords),
                         const SizedBox(height: 24),
                       ],
-                      _buildSavedSquadsSection(squadModel.mySquads),
+                      _buildSavedSquadsSection(_squads),
                       const SizedBox(height: 24),
                       // pass server-provided discoveryPlayers as fallback
                       _buildDiscoverPlayersSection(squadModel.discoveryPlayers),
@@ -325,7 +323,7 @@ class _DreamSquadPageState extends State<DreamSquadPage> {
               ),
             ),
         ],
-      ),
+      ),bottomNavigationBar: const BottomNav(),
     );
   }
 
@@ -1009,120 +1007,272 @@ class _DreamSquadPageState extends State<DreamSquadPage> {
         bool isSubmitting = false;
 
         return StatefulBuilder(builder: (context, setModalState) {
-          // helper untuk ambil squad by id (null-safe)
-          MySquad? _findSquadById(int? id) => id == null ? null : _squads.firstWhere((s) => s.id == id, orElse: () => MySquad(id: -1, name: 'Unknown', playerCount: 0));
+          MySquad? _findSquadById(int? id) =>
+              id == null ? null : _squads.firstWhere((s) => s.id == id, orElse: () => MySquad(id: -1, name: 'Unknown', playerCount: 0));
 
-          return AlertDialog(
-            title: const Text("Add player to squad"),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: _squads.isEmpty
-                  ? const Text("You don't have any squads yet. Create one first.")
-                  : Column(
-                mainAxisSize: MainAxisSize.min,
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520, maxHeight: 560),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // optional: search / hint bisa ditambahkan nanti
-                  Flexible(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: _squads.length,
-                      separatorBuilder: (_, __) => const Divider(),
-                      itemBuilder: (context, index) {
-                        final s = _squads[index];
-                        final bool isFull = s.playerCount >= maxCap;
-                        return RadioListTile<int>(
-                          value: s.id,
-                          groupValue: chosenSquadId,
-                          onChanged: isFull || isSubmitting
-                              ? null
-                              : (val) {
-                            setModalState(() => chosenSquadId = val);
-                          },
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // Header
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      border: Border(bottom: BorderSide(color: AppColors.slate200)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(child: Text(s.name)),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: isFull ? Colors.red.shade50 : Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: isFull ? Colors.red.shade100 : Colors.grey.shade200),
-                                ),
-                                child: Text(
-                                  "${s.playerCount}/$maxCap${isFull ? ' • Full' : ''}",
-                                  style: TextStyle(fontSize: 12, color: isFull ? Colors.red.shade700 : Colors.grey.shade700, fontWeight: FontWeight.w600),
-                                ),
-                              ),
+                              Text("Add player to squad",
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.slate900)),
+                              SizedBox(height: 6),
+                              Text("Choose the squad where this player will be added.",
+                                  style: TextStyle(fontSize: 12, color: AppColors.slate500)),
                             ],
                           ),
-                          subtitle: isFull ? const Text("This squad is full", style: TextStyle(color: Colors.red)) : Text("${s.playerCount} players"),
-                          dense: true,
-                        );
-                      },
+                        ),
+                        if (isSubmitting)
+                          const SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2))
+                        else
+                          IconButton(
+                            icon: const Icon(Icons.close, color: AppColors.slate500),
+                            onPressed: isSubmitting ? null : () => Navigator.pop(dialogCtx),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // Content
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: _squads.isEmpty
+                          ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.inbox, size: 48, color: AppColors.slate200),
+                            SizedBox(height: 12),
+                            Text("You don't have any squads yet.\nCreate one first to add players.",
+                                textAlign: TextAlign.center, style: TextStyle(color: AppColors.slate500)),
+                          ],
+                        ),
+                      )
+                          : ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Material(
+                          color: Colors.white,
+                          child: ListView.separated(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            itemCount: _squads.length,
+                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            itemBuilder: (context, index) {
+                              final s = _squads[index];
+                              final bool isFull = s.playerCount >= maxCap;
+                              final bool selected = chosenSquadId == s.id;
+                              final double fill = (s.playerCount / maxCap).clamp(0.0, 1.0);
+
+                              return InkWell(
+                                onTap: (isFull || isSubmitting)
+                                    ? null
+                                    : () => setModalState(() => chosenSquadId = s.id),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                  color: selected ? AppColors.indigo50.withOpacity(0.35) : Colors.white,
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 44,
+                                        height: 44,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.slate100,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            s.name.isNotEmpty ? s.name[0].toUpperCase() : "?",
+                                            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.slate700),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    s.name,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: AppColors.slate900,
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: isFull ? Colors.red.shade50 : AppColors.slate100,
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    border: Border.all(color: isFull ? Colors.red.shade100 : AppColors.slate200),
+                                                  ),
+                                                  child: Text(
+                                                    "${s.playerCount}/$maxCap${isFull ? ' • Full' : ''}",
+                                                    style: TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: isFull ? Colors.red.shade700 : AppColors.slate700),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 8),
+                                            SizedBox(
+                                              height: 6,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(6),
+                                                child: LinearProgressIndicator(
+                                                  value: fill,
+                                                  minHeight: 6,
+                                                  backgroundColor: AppColors.slate100,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 6),
+                                            Text("${s.playerCount} players", style: const TextStyle(fontSize: 11, color: AppColors.slate500)),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      if (isFull)
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: const [
+                                            Icon(Icons.block, color: Colors.redAccent, size: 18),
+                                            SizedBox(height: 4),
+                                            Text('Full', style: TextStyle(fontSize: 10, color: Colors.redAccent)),
+                                          ],
+                                        )
+                                      else
+                                        Radio<int>(
+                                          value: s.id,
+                                          groupValue: chosenSquadId,
+                                          onChanged: (isSubmitting) ? null : (val) => setModalState(() => chosenSquadId = val),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Actions
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                      border: Border(top: BorderSide(color: AppColors.slate200)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: isSubmitting ? null : () => Navigator.pop(dialogCtx),
+                            child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          height: 44,
+                          child: ElevatedButton(
+                            onPressed: (chosenSquadId == null || isSubmitting)
+                                ? null
+                                : () async {
+                              // double-check selected squad capacity before sending
+                              final selected = _findSquadById(chosenSquadId);
+                              if (selected == null || selected.id == -1) {
+                                // unexpected — reset selection
+                                setModalState(() => chosenSquadId = null);
+                                return;
+                              }
+                              if (selected.playerCount >= maxCap) {
+                                // sudah penuh (mungkin race condition) — beri tahu user dan jangan submit
+                                setModalState(() => chosenSquadId = null);
+                                _showSnackBar("Selected squad is already full.", AppColors.rose500);
+                                return;
+                              }
+
+                              // submit (LOGIC: tidak diubah)
+                              setModalState(() => isSubmitting = true);
+                              try {
+                                final resp = await _service.addPlayerToSquad(selected.id, playerId);
+                                if (resp['success'] == true) {
+                                  // Tutup modal SEGERA supaya user tidak terjebak loading
+                                  Navigator.pop(dialogCtx);
+
+                                  // Update quick local UI setelah modal tertutup
+                                  final idx = _squads.indexWhere((s) => s.id == chosenSquadId);
+                                  if (idx != -1) {
+                                    setState(() {
+                                      _squads[idx].playerCount = (_squads[idx].playerCount) + 1;
+                                    });
+                                  }
+
+                                  // Tampilkan notifikasi sukses (context halaman utama masih valid)
+                                  _showSnackBar(resp['message'] ?? "Player added to squad!", AppColors.emerald600);
+
+                                  // Refresh data utama (tetap tunggu agar UI sinkron)
+                                  await _refreshSquads();
+                                } else {
+                                  // tetap di modal, re-enable actions
+                                  setModalState(() => isSubmitting = false);
+                                  _showSnackBar(resp['error'] ?? "Failed to add player", AppColors.rose500);
+                                }
+                              } catch (e) {
+                                setModalState(() => isSubmitting = false);
+                                _showSnackBar("Error: $e", AppColors.rose500);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.slate900,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                            ),
+                            child: isSubmitting
+                                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                : const Text("Add", style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: isSubmitting ? null : () => Navigator.pop(dialogCtx),
-                child: const Text("Cancel"),
-              ),
-              ElevatedButton(
-                onPressed: (chosenSquadId == null || isSubmitting)
-                    ? null
-                    : () async {
-                  // double-check selected squad capacity before sending
-                  final selected = _findSquadById(chosenSquadId);
-                  if (selected == null || selected.id == -1) {
-                    // unexpected — reset selection
-                    setModalState(() => chosenSquadId = null);
-                    return;
-                  }
-                  if (selected.playerCount >= maxCap) {
-                    // sudah penuh (mungkin race condition) — beri tahu user dan jangan submit
-                    setModalState(() => chosenSquadId = null);
-                    _showSnackBar("Selected squad is already full.", AppColors.rose500);
-                    return;
-                  }
-
-                  // submit
-                  setModalState(() => isSubmitting = true);
-                  try {
-                    final resp = await _service.addPlayerToSquad(selected.id, playerId);
-                    if (resp['success'] == true) {
-                      // Optimis: update local _squads count agar UI modal/daftar cepat berubah
-                      final idx = _squads.indexWhere((s) => s.id == chosenSquadId);
-                      if (idx != -1) {
-                        setState(() {
-                          _squads[idx].playerCount = (_squads[idx].playerCount) + 1;
-                        });
-                      }
-
-                      // Tampilkan pesan sukses
-                      _showSnackBar("Player added to squad!", AppColors.emerald600);
-
-                      // Refresh full data: reload local list + update FutureBuilder future
-                      await _refreshSquads();
-                    } else {
-                      _showSnackBar(resp['error'] ?? "Failed to add player", AppColors.rose500);
-                    }
-                  } catch (e) {
-                    setModalState(() => isSubmitting = false);
-                    _showSnackBar("Error: $e", AppColors.rose500);
-                  }
-                },
-                child: isSubmitting
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Text("Add"),
-              ),
-            ],
           );
         });
       },
     );
   }
+
 }

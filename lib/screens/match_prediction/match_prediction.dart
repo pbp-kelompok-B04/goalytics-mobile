@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:goalytics_mobile/models/match_model.dart';
-import 'package:goalytics_mobile/widgets/left_drawer.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_detail_screen.dart';
 import 'package:goalytics_mobile/service/api_config.dart';
 import 'package:goalytics_mobile/screens/match_prediction/match_form_screen.dart';
+import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 
 class MatchPredictionPage extends StatefulWidget {
   const MatchPredictionPage({super.key});
@@ -17,18 +18,19 @@ class MatchPredictionPage extends StatefulWidget {
 class _MatchPredictionPageState extends State<MatchPredictionPage> {
   bool _isManager = false;
 
+  final Color _themeColor = const Color(0xff1c2341);
+
   @override
   void initState() {
     super.initState();
-    // 👇 Panggil fungsi cek role
     Future.microtask(() => _fetchUserRole());
   }
 
-  // 👇 Fungsi Baru
   Future<void> _fetchUserRole() async {
     final request = context.read<CookieRequest>();
     try {
-      final response = await request.get('${ApiConfig.baseUrl}/matchprediction/get-role/');
+      final response =
+          await request.get('${ApiConfig.baseUrl}/matchprediction/get-role/');
       if (mounted) {
         setState(() {
           _isManager = response['is_manager'] ?? false;
@@ -40,10 +42,8 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
   }
 
   Future<List<Match>> fetchMatches(CookieRequest request) async {
-    // Sesuaikan path URL dengan yang ada di urls.py Django
-    final response = await request.get('${ApiConfig.baseUrl}/matchprediction/json/');
-
-    // Konversi JSON response menjadi list object Match
+    final response =
+        await request.get('${ApiConfig.baseUrl}/matchprediction/json/');
     List<Match> listMatch = [];
     for (var d in response) {
       if (d != null) {
@@ -58,107 +58,331 @@ class _MatchPredictionPageState extends State<MatchPredictionPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
+      backgroundColor:
+          Colors.grey[50], // Background agak abu terang biar card putih pop-up
+      // 1. AppBar Transparan & Icon Hitam (Theme Color)
       appBar: AppBar(
-        title: const Text('Match Predictions'),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false,
       ),
-      drawer: const LeftDrawer(),
-      floatingActionButton: _isManager ? FloatingActionButton(
-        onPressed: () async {
-          // Buka halaman Form
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MatchFormScreen(),
-            ),
-          );
-          // Refresh halaman setelah balik (agar match baru muncul)
-          setState(() {});
-        },
-        backgroundColor: Colors.indigo,
-        child: const Icon(Icons.add, color: Colors.white),
-      )
+      bottomNavigationBar: const BottomNav(),
+
+      floatingActionButton: _isManager
+          ? FloatingActionButton.extended(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MatchFormScreen(),
+                  ),
+                );
+                setState(() {}); // Refresh setelah create match
+              },
+              backgroundColor: _themeColor,
+              icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+              label: const Text("New Match",
+                  style: TextStyle(color: Colors.white)),
+            )
           : null,
 
-      body: FutureBuilder(
-        future: fetchMatches(request),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (!snapshot.hasData) {
-              return const Column(
-                children: [
-                  Text(
-                    "No matches available.",
-                    style: TextStyle(color: Color(0xff59A5D8), fontSize: 20),
-                  ),
-                  SizedBox(height: 8),
-                ],
-              );
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (_, index) {
-                  Match match = snapshot.data![index];
-                  // Format tanggal sederhana
-                  String date = match.fields.matchDatetime.toString().substring(0, 16);
-
-                  return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: InkWell(
-                      onTap: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MatchDetailScreen(match: match),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {});
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Football Match\nPrediction",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: _themeColor,
+                              height: 1.1,
+                            ),
                           ),
-                        );
+                          const SizedBox(height: 12),
+                          Text(
+                            "Predict the score, beat the odds, and rule the leaderboard!",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                        if (result == true) {
-                          setState(() {});
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${match.fields.homeClubName ?? 'TBD'} vs ${match.fields.awayClubName ?? 'TBD'}",
-                              style: const TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                                const SizedBox(width: 6),
-                                Text(date),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                const Icon(Icons.stadium, size: 16, color: Colors.grey),
-                                const SizedBox(width: 6),
-                                Text(match.fields.venue),
-                              ],
-                            ),
-                          ],
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: _themeColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Icon(
+                          Icons.insights,
+                          size: 40,
+                          color: _themeColor,
                         ),
                       ),
                     ),
-                  );
-                },
-              );
+                  ],
+                ),
+
+                const SizedBox(height: 30),
+
+                Row(
+                  children: [
+                    Icon(Icons.calendar_month_outlined,
+                        size: 20, color: _themeColor),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Upcoming Games",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: _themeColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+
+                FutureBuilder(
+                  future: fetchMatches(request),
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                          child: Padding(
+                        padding: EdgeInsets.all(50.0),
+                        child: CircularProgressIndicator(),
+                      ));
+                    } else if (!snapshot.hasData || snapshot.data.isEmpty) {
+                      return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(30),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(Icons.sports_soccer,
+                                size: 50, color: Colors.grey[300]),
+                            const SizedBox(height: 10),
+                            const Text("No upcoming matches.",
+                                style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (_, index) {
+                          Match match = snapshot.data![index];
+                          return _buildMatchCard(context, match);
+                        },
+                      );
+                    }
+                  },
+                ),
+
+                const SizedBox(height: 80),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMatchCard(BuildContext context, Match match) {
+    String rawDate = match.fields.matchDatetime.toString();
+    String date = rawDate.length > 16
+        ? rawDate.substring(0, 16).replaceAll('T', ' • ')
+        : rawDate;
+
+    String homeTeam = match.fields.homeClubName ?? 'TBD';
+    String awayTeam = match.fields.awayClubName ?? 'TBD';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MatchDetailScreen(match: match),
+              ),
+            );
+            if (result == true) {
+              setState(() {});
             }
-          }
-        },
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.calendar_today,
+                        size: 12, color: Colors.grey[500]),
+                    const SizedBox(width: 4),
+                    Text(
+                      date,
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                        width: 1,
+                        height: 12,
+                        color: Colors.grey[300]), // Separator
+                    const SizedBox(width: 10),
+                    Icon(Icons.stadium, size: 12, color: Colors.grey[500]),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        match.fields.venue,
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _buildTeamAvatar(homeTeam),
+                          const SizedBox(height: 8),
+                          Text(
+                            homeTeam,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: _themeColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          "VS",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _buildTeamAvatar(awayTeam),
+                          const SizedBox(height: 8),
+                          Text(
+                            awayTeam,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: _themeColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeamAvatar(String teamName) {
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: Center(
+        child: Text(
+          teamName.isNotEmpty ? teamName[0].toUpperCase() : "?",
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: _themeColor.withOpacity(0.7),
+          ),
+        ),
       ),
     );
   }
