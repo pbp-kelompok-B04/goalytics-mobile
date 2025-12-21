@@ -49,7 +49,7 @@ class _PlayerDetailPageState extends State<PlayerDetailPage> {
         elevation: 0,
         leading: IconButton(
           tooltip: 'Back',
-          icon: Icon(Icons.arrow_back, color: _LocalColors.slate900),
+          icon: Icon(Icons.arrow_back, color: _LocalColors.slate700),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: const Text(
