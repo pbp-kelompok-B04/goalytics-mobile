@@ -5,12 +5,12 @@ Platform mobile interaktif untuk penggemar sepak bola yang ingin mengakses stati
 Aplikasi ini hadir untuk menjawab kebutuhan pengguna yang selama ini harus mencari data pemain, forum diskusi, dan insight pertandingan dari sumber yang tersebar. Goalytics Mobile menyatukan semuanya dalam satu ekosistem lengkap — cepat, ringkas, dan mobile-friendly.
 
 ## Install
-![Build Status](https://app.bitrise.io/app/413c8e52-48e3-41e6-a98a-5bb163d0d127/status.svg?token=hPfG1Ehpdx2MLieN_gPyYg&branch=main)
+[![Build Status](https://app.bitrise.io/app/413c8e52-48e3-41e6-a98a-5bb163d0d127/status.svg?token=hPfG1Ehpdx2MLieN_gPyYg&branch=main)](https://app.bitrise.io/app/413c8e52-48e3-41e6-a98a-5bb163d0d127)
 
-https://app.bitrise.io/app/413c8e52-48e3-41e6-a98a-5bb163d0d127/installable-artifacts/e6328d63220739e1/public-install-page/4f65bcb9feaf091763c753cf5f3117a3
+[Download APK](https://app.bitrise.io/app/413c8e52-48e3-41e6-a98a-5bb163d0d127/installable-artifacts/12b90dc464cd98bc/public-install-page/d354dbf4174641c0f649453fb4fd15b4)
 
-
-
+## Video Promosi
+[video](https://www.youtube.com/watch?si=ej3ABbM-FNgQTiTm&v=fNdzJhCpEY4&feature=youtu.be)
 
 ## 👥 Anggota Tim
 
