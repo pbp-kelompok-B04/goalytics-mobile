@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/ProfileEntry.dart';
 import 'profile_detail_page.dart';
-import 'package:goalytics_mobile/widgets/bottom_nav.dart';
 
 const Color _navy = Color(0xFF0F172A);
 const Color _navy2 = Color(0xFF111827);
@@ -198,8 +197,6 @@ class _ExploreProfilesPageState extends State<ExploreProfilesPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F5F7),
-      bottomNavigationBar: const BottomNav(),
-
       body: SafeArea(
         child: Column(
           children: [

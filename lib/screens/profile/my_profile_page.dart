@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../../models/ProfileEntry.dart';
 import '../../service/api_config.dart';
 import 'package:goalytics_mobile/widgets/bottom_nav.dart'; 
-
+import 'package:goalytics_mobile/screens/profile/explore_profile_page.dart';
 
 String formatJoinedMonthYear(String iso) {
   final raw = iso.trim();
@@ -300,6 +300,35 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 },
                               ),
                               const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton.icon(
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    side: const BorderSide(color: Color(0xFF101828)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.explore, color: Color(0xFF101828)),
+                                  label: const Text(
+                                    "Discover Other Users",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF101828),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const ExploreProfilesPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20),
 
                               if (_isEditing) ...[
                                 _SectionCard(
