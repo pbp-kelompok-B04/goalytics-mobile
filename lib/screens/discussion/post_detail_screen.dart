@@ -449,7 +449,7 @@ void _confirmDelete(ForumComment comment) {
   Widget build(BuildContext context) {
     final page = SafeArea(
       child: Container(
-        color: const Color(0xFFF8FAFC),
+        color: Colors.white,
         child: _loading
             ? _buildLoadingLayout()
             : _post == null
@@ -460,7 +460,7 @@ void _confirmDelete(ForumComment comment) {
 
     if (!widget.withSidebar) {
       return Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
@@ -475,8 +475,9 @@ void _confirmDelete(ForumComment comment) {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
       drawer: const LeftDrawer(),
