@@ -84,14 +84,13 @@ class YouTubeVideoPlayer extends StatefulWidget {
 }
 
 class _YouTubeVideoPlayerState extends State<YouTubeVideoPlayer> {
-  late YoutubePlayerController _controller;
+  YoutubePlayerController? _controller;
+  bool _isPlaying = false;
 
-  @override
-  void initState() {
-    super.initState();
+  void _startPlaying() {
     _controller = YoutubePlayerController.fromVideoId(
       videoId: widget.videoId,
-      autoPlay: false,
+      autoPlay: true,
       params: const YoutubePlayerParams(
         showControls: true,
         mute: false,
@@ -99,20 +98,85 @@ class _YouTubeVideoPlayerState extends State<YouTubeVideoPlayer> {
         loop: false,
       ),
     );
+    setState(() => _isPlaying = true);
   }
 
   @override
   void dispose() {
-    _controller.close();
+    _controller?.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Show thumbnail with play button until user taps
+    if (!_isPlaying) {
+      final thumb = 'https://img.youtube.com/vi/${widget.videoId}/hqdefault.jpg';
+      return GestureDetector(
+        onTap: _startPlaying,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Image.network(
+                  thumb,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: Colors.black,
+                    child: const Center(
+                      child: Icon(Icons.play_circle_fill,
+                          color: Colors.white, size: 64),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.4),
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(12),
+                child: const Icon(
+                  Icons.play_arrow_rounded,
+                  color: Colors.white,
+                  size: 48,
+                ),
+              ),
+              // YouTube logo indicator
+              Positioned(
+                bottom: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'YouTube',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Show actual player when user taps
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: YoutubePlayer(
-        controller: _controller,
+        controller: _controller!,
         aspectRatio: 16 / 9,
       ),
     );
